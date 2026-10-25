@@ -1,0 +1,2267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>EmeraldTrade | User Panel Demo</title>
+  <style>
+    :root {
+      --bg: #050b0d;
+      --bg-2: #0e1719;
+      --panel: rgba(15, 25, 27, 0.9);
+      --panel-2: rgba(17, 31, 31, 0.95);
+      --card: #0d1718;
+      --soft: #0f2527;
+      --line: rgba(63, 255, 183, 0.18);
+      --emerald: #1ef0a6;
+      --emerald-2: #13b889;
+      --emerald-3: #8cf5d4;
+      --danger: #ff6a6a;
+      --warning: #ffd166;
+      --text: #ebfff9;
+      --muted: #8ab6a8;
+      --shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(circle at top, #0d201d 0%, #060b0d 40%, #030707 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input, select, textarea {
+      font: inherit;
+    }
+
+    .emerald-demo {
+      max-width: 540px;
+      min-height: 100vh;
+      margin: 0 auto;
+      background: linear-gradient(180deg, rgba(5,11,13,0.98), rgba(4,10,11,0.97));
+      position: relative;
+      padding-bottom: 90px;
+      overflow: hidden;
+    }
+
+    .emerald-demo::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(30, 240, 166, 0.18), transparent 30%),
+        radial-gradient(circle at 90% 40%, rgba(19, 184, 137, 0.16), transparent 28%);
+      pointer-events: none;
+    }
+
+    .demo-banner {
+      margin: 10px 16px 0;
+      background: rgba(15, 39, 35, 0.7);
+      border: 1px solid var(--line);
+      color: var(--emerald-3);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      z-index: 1;
+    }
+    .demo-banner .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--emerald); box-shadow: 0 0 12px rgba(30, 240, 166, 0.9); }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(16px);
+      background: rgba(6, 11, 13, 0.7);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      padding: 14px 16px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 1;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-mark {
+      width: 38px; height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--emerald), #0d5144);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 700; color: #03241b;
+      box-shadow: 0 10px 20px rgba(19, 184, 137, 0.35);
+    }
+
+    .brand-text {
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+    .brand-text small {
+      display: block;
+      color: var(--muted);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .header-user {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 12px;
+      background: rgba(14, 23, 24, 0.8);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--text);
+      font-size: 12px;
+      max-width: 180px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .header-user .avatar {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: linear-gradient(135deg, #1ef0a6, #0d8a66);
+      display: flex; align-items:center; justify-content:center;
+      font-size: 11px; font-weight: 700; color: #021b14;
+    }
+
+    .page {
+      display: none;
+      animation: fadeUp 0.3s ease-in-out;
+      position: relative;
+      z-index: 1;
+      padding: 16px;
+    }
+    .page.active { display: block; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-title {
+      margin: 10px 0 12px;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(30, 240, 166, 0.1);
+      border: 1px solid rgba(30,240,166,0.2);
+      color: var(--emerald-3);
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .stat-card, .card, .panel, .empty {
+      background: linear-gradient(180deg, rgba(17,26,27,0.92), rgba(12,17,18,0.9));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .stat-card {
+      padding: 16px 14px 14px;
+      min-height: 120px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::after {
+      content: "";
+      position: absolute;
+      width: 90px;
+      height: 90px;
+      right: -18px;
+      top: -20px;
+      background: radial-gradient(circle, rgba(30,240,166,0.18) 0%, rgba(30,240,166,0.02) 60%, transparent 100%);
+      border-radius: 50%;
+    }
+
+    .label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .stat-value {
+      font-weight: 800;
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      letter-spacing: -0.04em;
+      margin-bottom: 4px;
+    }
+
+    .stat-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .trend.up { color: var(--emerald-3); }
+    .trend.down { color: #ff9c9c; }
+
+    .card {
+      padding: 16px;
+      margin-top: 16px;
+    }
+
+    .tx-list, .notif-list, .mini-list, .table-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: rgba(10,18,19,0.8);
+      border: 1px solid rgba(255,255,255,0.04);
+      border-radius: 14px;
+      padding: 12px 12px;
+    }
+
+    .item-main {
+      display: flex; align-items: center; gap: 10px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .icon-box {
+      width: 38px; height: 38px;
+      border-radius: 12px;
+      display: flex; align-items:center; justify-content:center;
+      font-size: 18px;
+      background: rgba(30,240,166,0.08);
+      border: 1px solid rgba(30,240,166,0.18);
+      flex-shrink: 0;
+    }
+
+    .item-text { min-width: 0; flex: 1; }
+    .item-text strong {
+      display: block;
+      font-size: 14px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .item-text small {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 4px;
+    }
+
+    .amount {
+      font-weight: 700;
+      font-size: 15px;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .status-pill {
+      display: inline-block;
+      padding: 6px 9px;
+      border-radius: 999px;
+      font-size: 10px;
+      line-height: 1;
+      font-weight: 700;
+      border: 1px solid transparent;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .status-approved { background: rgba(30,240,166,0.1); color: var(--emerald-3); border-color: rgba(30,240,166,0.2); }
+    .status-pending { background: rgba(255,209,102,0.1); color: var(--warning); border-color: rgba(255,209,102,0.25); }
+    .status-rejected { background: rgba(255,106,106,0.12); color: #ffb0b0; border-color: rgba(255,106,106,0.25); }
+    .status-paid { background: rgba(30,240,166,0.08); color: var(--emerald-3); border-color: rgba(30,240,166,0.2); }
+    .status-processing { background: rgba(142,188,255,0.1); color: #bbd5ff; border-color: rgba(142,188,255,0.2); }
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .quick-btn {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(17,26,27,0.92), rgba(12,17,18,0.9));
+      color: var(--text);
+      border-radius: 14px;
+      padding: 12px 8px;
+      font-size: 12px;
+      font-weight: 600;
+      min-height: 72px;
+      display: flex; flex-direction: column; align-items:center; justify-content:center; gap:6px;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .quick-btn:active { transform: scale(0.98); }
+    .quick-btn:hover { border-color: rgba(30,240,166,0.28); }
+
+    .quick-btn .emoji {
+      font-size: 20px;
+      width: 38px; height: 38px; display:flex; align-items:center; justify-content:center;
+      border-radius: 11px; background: rgba(30,240,166,0.08);
+    }
+
+    .panel {
+      padding: 16px;
+      margin-top: 16px;
+    }
+
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .field-group label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .field-group input,
+    .field-group select,
+    .field-group textarea {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(10,17,18,0.9);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .field-group textarea { min-height: 110px; resize: vertical; }
+    .field-group input:focus, .field-group select:focus, .field-group textarea:focus {
+      border-color: rgba(30,240,166,0.32);
+      box-shadow: 0 0 0 4px rgba(30,240,166,0.07);
+    }
+
+    .primary-btn, .secondary-btn, .ghost-btn {
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+      border-radius: 12px;
+      font-weight: 700;
+    }
+
+    .primary-btn {
+      width: 100%;
+      padding: 14px 16px;
+      color: #031b14;
+      background: linear-gradient(135deg, var(--emerald), #56f9c7);
+      box-shadow: 0 12px 22px rgba(30,240,166,0.18);
+    }
+    .secondary-btn {
+      padding: 12px 16px;
+      background: rgba(30,240,166,0.1);
+      border: 1px solid rgba(30,240,166,0.2);
+      color: var(--emerald-3);
+    }
+    .ghost-btn {
+      padding: 12px 16px;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--text);
+    }
+
+    .primary-btn:active, .secondary-btn:active, .ghost-btn:active { transform: scale(0.99); }
+
+    .split-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .split-row > * { flex: 1; }
+
+    .form-link {
+      color: var(--emerald-3);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .auth-shell {
+      min-height: calc(100vh - 120px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 18px 16px 90px;
+    }
+
+    .auth-card {
+      width: 100%;
+      background: linear-gradient(180deg, rgba(16,24,27,0.94), rgba(8,13,15,0.96));
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      padding: 18px 16px 16px;
+    }
+
+    .auth-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .auth-tabs {
+      display: flex;
+      background: rgba(11,16,17,0.8);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 999px;
+      padding: 4px;
+      gap: 4px;
+      width: 100%;
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .auth-tab.active {
+      background: linear-gradient(135deg, rgba(30,240,166,0.18), rgba(30,240,166,0.05));
+      color: var(--emerald-3);
+      border: 1px solid rgba(30,240,166,0.2);
+    }
+
+    .auth-form {
+      display: none;
+      margin-top: 16px;
+      animation: fadeUp 0.25s ease;
+    }
+    .auth-form.active { display: block; }
+
+    .tiny-note {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .demo-user-box {
+      background: rgba(30,240,166,0.08);
+      border: 1px solid rgba(30,240,166,0.16);
+      border-radius: 14px;
+      padding: 12px;
+      color: var(--emerald-3);
+      font-size: 12px;
+      margin-top: 12px;
+    }
+
+    .stats-strip {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .mini-pill {
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(11,16,17,0.9);
+      border: 1px solid rgba(255,255,255,0.04);
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .list-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+    .list-table th, .list-table td {
+      padding: 10px 8px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-size: 12px;
+      color: var(--text);
+    }
+    .list-table th {
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-top: 12px;
+    }
+
+    .product-card {
+      background: linear-gradient(180deg, rgba(16,23,25,0.96), rgba(10,15,16,0.92));
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .product-image {
+      height: 172px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+    .product-chip {
+      position: absolute;
+      top: 12px; left: 12px;
+      background: rgba(4, 15, 14, 0.75);
+      border: 1px solid rgba(30,240,166,0.2);
+      color: var(--emerald-3);
+      padding: 6px 8px; border-radius: 999px; font-size: 10px; font-weight: 700;
+    }
+    .product-body {
+      padding: 14px;
+    }
+    .product-header {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .product-name {
+      font-weight: 800;
+      font-size: 1.05rem;
+      margin: 0;
+      line-height: 1.3;
+    }
+    .product-price {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--emerald-3);
+      white-space: nowrap;
+    }
+    .product-id {
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      margin: 4px 0 8px;
+      text-transform: uppercase;
+    }
+    .product-desc {
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+    .product-details {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin-bottom: 12px;
+    }
+    .product-detail {
+      background: rgba(19,31,31,0.9);
+      border: 1px solid rgba(255,255,255,0.05);
+      color: var(--muted);
+      border-radius: 999px; padding: 6px 8px; font-size: 10px;
+    }
+
+    .empty {
+      padding: 18px 14px;
+      text-align: center;
+      color: var(--muted);
+      margin-top: 12px;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: max(12px, env(safe-area-inset-bottom));
+      width: min(540px, calc(100% - 16px));
+      background: rgba(8,15,17,0.82);
+      border: 1px solid rgba(30,240,166,0.16);
+      backdrop-filter: blur(18px);
+      border-radius: 20px;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0,1fr));
+      gap: 8px;
+      padding: 8px;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+      z-index: 50;
+    }
+
+    .nav-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      padding: 10px 8px 8px;
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      font-size: 10px;
+      font-weight: 700;
+      min-height: 56px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-btn.active {
+      background: linear-gradient(135deg, rgba(30,240,166,0.18), rgba(30,240,166,0.08));
+      color: var(--emerald-3);
+      border: 1px solid rgba(30,240,166,0.2);
+    }
+    .nav-btn .nav-emoji { font-size: 18px; }
+
+    .helper-list {
+      display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+    .helper-item {
+      background: rgba(12,17,18,0.8); border: 1px solid rgba(255,255,255,0.04);
+      border-radius: 14px; padding: 12px;
+    }
+    .helper-item h4 {
+      margin: 0 0 6px; font-size: 15px;
+    }
+    .helper-item p {
+      color: var(--muted); line-height: 1.7; margin: 0; font-size: 13px;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(3,8,8,0.72);
+      display: none;
+      align-items: end;
+      justify-content: center;
+      z-index: 80;
+      padding: 18px 12px;
+    }
+    .modal.show { display: flex; }
+    .modal-card {
+      width: min(540px, 100%);
+      background: linear-gradient(180deg, rgba(15,22,24,0.98), rgba(8,12,13,1));
+      border: 1px solid var(--line);
+      border-radius: 22px 22px 18px 18px;
+      padding: 18px 16px 16px;
+      box-shadow: var(--shadow);
+      animation: slideUp 0.25s ease;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .modal-header {
+      display: flex; align-items:center; justify-content:space-between; gap: 12px;
+      margin-bottom: 8px;
+    }
+    .close-modal {
+      border: none; background: rgba(255,255,255,0.04); color: var(--text);
+      width: 32px; height: 32px; border-radius: 50%; cursor:pointer;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 100px;
+      background: rgba(8,15,17,0.98);
+      border: 1px solid rgba(30,240,166,0.2);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 12px;
+      opacity: 0;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 100;
+      pointer-events: none;
+      box-shadow: var(--shadow);
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-6px);
+    }
+
+    .loader {
+      position: fixed;
+      inset: 0;
+      background: rgba(3,8,8,0.46);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 120;
+    }
+    .loader.show { display: flex; }
+    .spinner {
+      width: 46px; height: 46px;
+      border-radius: 50%;
+      border: 4px solid rgba(255,255,255,0.12);
+      border-top-color: var(--emerald);
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (min-width: 680px) {
+      .product-grid {
+        grid-template-columns: repeat(2, minmax(0,1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="emerald-demo">
+    <div class="topbar">
+      <div class="brand-wrap">
+        <div class="brand-mark">E</div>
+        <div class="brand-text">
+          EmeraldTrade
+          <small>Investor Panel</small>
+        </div>
+      </div>
+      <div id="headerUser" class="header-user">
+        <div class="avatar">D</div>
+        <span>Demo User</span>
+      </div>
+    </div>
+
+    <div class="demo-banner">
+      <span class="dot"></span>
+      Demo mode only. No real money moves without verified payment confirmation and secure backend approval.
+    </div>
+
+    <main>
+      <section id="authPage" class="page active">
+        <div class="auth-shell">
+          <div class="auth-card">
+            <div class="auth-header">
+              <div class="brand-wrap">
+                <div class="brand-mark">E</div>
+                <div class="brand-text">
+                  EmeraldTrade
+                  <small>Secure Demo</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="auth-tabs">
+              <button class="auth-tab active" data-auth="login">Login</button>
+              <button class="auth-tab" data-auth="register">Register</button>
+            </div>
+
+            <form id="loginForm" class="auth-form active">
+              <div class="field-group">
+                <label for="loginEmail">Email or Username</label>
+                <input id="loginEmail" name="email" type="text" placeholder="demo@emeraldtrade.demo" required />
+              </div>
+              <div class="field-group">
+                <label for="loginPassword">Password</label>
+                <input id="loginPassword" name="password" type="password" placeholder="********" required />
+              </div>
+              <button type="submit" class="primary-btn">Login to Demo Account</button>
+              <div class="split-row">
+                <button type="button" class="secondary-btn" id="useDemoAccountBtn">Use Demo Account</button>
+                <button type="button" class="ghost-btn" id="demoModeBtn">Demo Mode</button>
+              </div>
+              <div class="demo-user-box">
+                Demo account: <strong>demo@emeraldtrade.demo</strong><br />
+                Password: <strong>demo1234</strong>
+              </div>
+              <div class="tiny-note">
+                This is a frontend demo interface only. It does not represent secure authentication, protected session management, or real financial access.
+              </div>
+            </form>
+
+            <form id="registerForm" class="auth-form">
+              <div class="field-group">
+                <label for="regName">Full Name</label>
+                <input id="regName" name="name" type="text" placeholder="John Carter" required />
+              </div>
+              <div class="field-group">
+                <label for="regEmail">Email Address</label>
+                <input id="regEmail" name="email" type="email" placeholder="you@example.com" required />
+              </div>
+              <div class="field-group">
+                <label for="regUsername">Username</label>
+                <input id="regUsername" name="username" type="text" placeholder="investor_01" required />
+              </div>
+              <div class="field-group">
+                <label for="regPassword">Password</label>
+                <input id="regPassword" name="password" type="password" placeholder="Min 6 chars" minlength="6" required />
+              </div>
+              <div class="field-group">
+                <label for="regRef">Referral Code (Optional)</label>
+                <input id="regRef" name="ref" type="text" placeholder="EMERD10" />
+              </div>
+              <button type="submit" class="primary-btn">Create Demo Account</button>
+              <div class="tiny-note">
+                This is a demo registration UI. Real user registration must use backend validation, strong password hashing, email verification, and secure token issuance.
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section id="dashboardPage" class="page">
+        <div class="section-title">
+          <span>Dashboard</span>
+          <span class="badge">Live Demo</span>
+        </div>
+
+        <div class="stats-grid" id="dashboardStats"></div>
+
+        <div class="card">
+          <div class="section-title">
+            <span>Quick Actions</span>
+          </div>
+          <div class="quick-actions">
+            <button class="quick-btn" data-page="depositPage">
+              <span class="emoji">💳</span>
+              Deposit
+            </button>
+            <button class="quick-btn" data-page="withdrawPage">
+              <span class="emoji">🏦</span>
+              Withdraw
+            </button>
+            <button class="quick-btn" data-page="marketPage">
+              <span class="emoji">🛍️</span>
+              Shop
+            </button>
+            <button class="quick-btn" data-page="referralPage">
+              <span class="emoji">👥</span>
+              Referral
+            </button>
+            <button class="quick-btn" data-page="transactionsPage">
+              <span class="emoji">📊</span>
+              History
+            </button>
+            <button class="quick-btn" data-page="profilePage">
+              <span class="emoji">👤</span>
+              Profile
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">
+            <span>Recent Transactions</span>
+            <span class="badge" id="transactionBadge">0</span>
+          </div>
+          <div id="recentTxList" class="tx-list"></div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">
+            <span>Notifications</span>
+            <span class="badge" id="notificationBadge">0</span>
+          </div>
+          <div id="dashboardNotifications" class="notif-list"></div>
+        </div>
+      </section>
+
+      <section id="marketPage" class="page">
+        <div class="section-title">
+          <span>Product Marketplace</span>
+          <span class="badge">Premium Picks</span>
+        </div>
+        <div id="productGrid" class="product-grid"></div>
+      </section>
+
+      <section id="depositPage" class="page">
+        <div class="section-title">
+          <span>Deposit</span>
+          <span class="badge">Demo Notice</span>
+        </div>
+
+        <div class="panel">
+          <div class="tiny-note" style="margin-top:0; margin-bottom:10px;">
+            Demo mode only. Deposit requests do not receive real funds until a secure backend validates payment and confirms transaction status.
+          </div>
+
+          <form id="depositForm">
+            <div class="field-group">
+              <label for="depositAmount">Deposit Amount</label>
+              <input id="depositAmount" type="number" min="10" step="10" placeholder="500" required />
+            </div>
+            <div class="field-group">
+              <label for="depositMethod">Payment Method</label>
+              <select id="depositMethod" required>
+                <option value="">Select payment method</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="USDT">USDT</option>
+                <option value="Bank Card">Bank Card</option>
+                <option value="Crypto">Crypto</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label for="depositReference">Transaction Reference</label>
+              <input id="depositReference" type="text" placeholder="Example: TRX-3201 / Proof of payment" required />
+            </div>
+            <button type="submit" class="primary-btn">Submit Deposit Request</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="section-title">
+            <span>Deposit History</span>
+          </div>
+          <div id="depositHistory" class="tx-list"></div>
+        </div>
+      </section>
+
+      <section id="withdrawPage" class="page">
+        <div class="section-title">
+          <span>Withdraw</span>
+          <span class="badge">Demo Mode</span>
+        </div>
+
+        <div class="panel">
+          <div class="tiny-note" style="margin-top:0; margin-bottom:10px;">
+            Withdrawal requests in demo mode do not transfer real funds. Minimum withdrawal amount is set to 100 USD. Backend review is required before any actual transfer.
+          </div>
+
+          <form id="withdrawForm">
+            <div class="field-group">
+              <label for="withdrawAmount">Withdrawal Amount</label>
+              <input id="withdrawAmount" type="number" min="100" step="10" placeholder="500" required />
+            </div>
+            <div class="field-group">
+              <label for="withdrawMethod">Payment Method</label>
+              <select id="withdrawMethod" required>
+                <option value="">Select payment method</option>
+                <option value="Bank Account">Bank Account</option>
+                <option value="USDT Wallet">USDT Wallet</option>
+                <option value="E-Wallet">E-Wallet</option>
+                <option value="Crypto">Crypto Wallet</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label for="withdrawDestination">Destination Details</label>
+              <textarea id="withdrawDestination" placeholder="Bank account number, wallet address, or recipient details" required></textarea>
+            </div>
+            <button type="submit" class="primary-btn">Submit Withdrawal Request</button>
+          </form>
+          <div class="tiny-note" style="margin-top:12px;">
+            Minimum withdrawal: <strong>100 USD</strong>. Review times may vary. All withdrawals are pending review and require secure backend verification.
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">
+            <span>Withdrawal History</span>
+          </div>
+          <div id="withdrawHistory" class="tx-list"></div>
+        </div>
+      </section>
+
+      <section id="referralPage" class="page">
+        <div class="section-title">
+          <span>Referral System</span>
+          <span class="badge">Demo</span>
+        </div>
+
+        <div class="panel">
+          <div class="field-group">
+            <label>Your Referral Code</label>
+            <input id="refCodeDisplay" type="text" readonly />
+          </div>
+          <div class="field-group">
+            <label>Your Referral Link</label>
+            <input id="refLinkDisplay" type="text" readonly />
+          </div>
+          <div class="split-row">
+            <button class="secondary-btn" id="copyReferralBtn" type="button">Copy Referral Link</button>
+            <button class="ghost-btn" id="shareReferralBtn" type="button">Share</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">
+            <span>Referral Statistics</span>
+          </div>
+          <div id="refStats" class="stats-strip"></div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">
+            <span>Invited Members</span>
+          </div>
+          <div id="invitedMembersList" class="mini-list"></div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">
+            <span>Reward History</span>
+          </div>
+          <div id="rewardHistory" class="tx-list"></div>
+        </div>
+      </section>
+
+      <section id="productsPage" class="page">
+        <div class="section-title">
+          <span>My Products & Orders</span>
+          <span class="badge" id="myProductsCount">0</span>
+        </div>
+        <div id="ordersList" class="table-list"></div>
+      </section>
+
+      <section id="transactionsPage" class="page">
+        <div class="section-title">
+          <span>Transaction History</span>
+          <span class="badge">All Activity</span>
+        </div>
+
+        <div class="panel">
+          <div class="field-group">
+            <label for="transactionSearch">Search</label>
+            <input id="transactionSearch" type="text" placeholder="Search by ID, type, or description" />
+          </div>
+          <div class="field-group">
+            <label for="transactionFilter">Filter by Type</label>
+            <select id="transactionFilter">
+              <option value="all">All</option>
+              <option value="deposit">Deposit</option>
+              <option value="withdrawal">Withdrawal</option>
+              <option value="purchase">Purchase</option>
+              <option value="referral_reward">Referral Reward</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <table class="list-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Amt</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="transactionsTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="profilePage" class="page">
+        <div class="section-title">
+          <span>Profile</span>
+          <span class="badge">User ID</span>
+        </div>
+
+        <div class="panel" id="profilePanel"></div>
+
+        <div class="card">
+          <div class="section-title">
+            <span>Account Controls</span>
+          </div>
+          <div class="split-row">
+            <button class="secondary-btn" id="resetDemoDataBtn" type="button">Reset Demo Data</button>
+            <button class="ghost-btn" id="logoutBtn" type="button">Logout</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="notificationsPage" class="page">
+        <div class="section-title">
+          <span>Notifications</span>
+          <span class="badge" id="notiCount">0</span>
+        </div>
+        <div id="fullNotificationsList" class="notif-list"></div>
+      </section>
+
+      <section id="helpPage" class="page">
+        <div class="section-title">
+          <span>Help & Support</span>
+          <span class="badge">Support</span>
+        </div>
+        <div class="helper-list">
+          <div class="helper-item">
+            <h4>1. How do I buy products?</h4>
+            <p>Go to Product Marketplace, choose a product, click Buy Now, and confirm the order in the popup. In demo mode, a sample order is created instantly.</p>
+          </div>
+          <div class="helper-item">
+            <h4>2. How do deposits work?</h4>
+            <p>Use the deposit form to submit a request with method and reference. The demo is only for UX testing. Secure validation happens in a real backend.</p>
+          </div>
+          <div class="helper-item">
+            <h4>3. Is this secure?</h4>
+            <p>No. This is a frontend demo only. Authentication, payment processing, and sensitive data must be handled by a secure backend and database.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="faqPage" class="page">
+        <div class="section-title">
+          <span>FAQ</span>
+          <span class="badge">Common Queries</span>
+        </div>
+        <div class="helper-list">
+          <div class="helper-item">
+            <h4>Is it a real financial app?</h4>
+            <p>No. This is a UI/UX demo for Android-friendly fintech design. Real transactions require secure backend verification.</p>
+          </div>
+          <div class="helper-item">
+            <h4>Do withdrawals transfer money?</h4>
+            <p>No. Demo withdrawals are simulation only and do not transfer real funds.</p>
+          </div>
+          <div class="helper-item">
+            <h4>Can I reset all demo data?</h4>
+            <p>Yes, use the Reset Demo Data button in the Profile page.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="termsPage" class="page">
+        <div class="section-title">
+          <span>Terms & Conditions</span>
+          <span class="badge">Demo</span>
+        </div>
+        <div class="helper-list">
+          <div class="helper-item">
+            <h4>General</h4>
+            <p>This UI is a demonstration interface for educational and prototype purposes only. It does not constitute legal, financial, or broker-managed service.</p>
+          </div>
+          <div class="helper-item">
+            <h4>Use Restrictions</h4>
+            <p>Users must not treat demo data as live financial data. All actions are simulation-only until secured backend integration is completed.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="privacyPage" class="page">
+        <div class="section-title">
+          <span>Privacy Policy</span>
+          <span class="badge">Demo</span>
+        </div>
+        <div class="helper-list">
+          <div class="helper-item">
+            <h4>Data Handling</h4>
+            <p>Only non-sensitive demo data is stored locally in browser storage. No real payment credentials or personal financial details are used in this frontend demo.</p>
+          </div>
+          <div class="helper-item">
+            <h4>Production</h4>
+            <p>In a production environment, personal data should be encrypted, access-controlled, and stored in a secure database behind authenticated APIs.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="riskPage" class="page">
+        <div class="section-title">
+          <span>Risk Disclosure</span>
+          <span class="badge">Important</span>
+        </div>
+        <div class="helper-list">
+          <div class="helper-item">
+            <h4>Investment Risk</h4>
+            <p>All investment and product participation involve risk. This demo does not provide financial advice or any guarantee of returns. Actual investment decisions must be based on verified market data and compliant legal review.</p>
+          </div>
+          <div class="helper-item">
+            <h4>Demo Status</h4>
+            <p>Nothing in this page shall be interpreted as operating financial transactions or legal commitments. It is a non-production frontend prototype.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" id="bottomNav" aria-label="Main navigation">
+      <button class="nav-btn active" data-page="dashboardPage"><span class="nav-emoji">🏠</span>Home</button>
+      <button class="nav-btn" data-page="marketPage"><span class="nav-emoji">🛒</span>Shop</button>
+      <button class="nav-btn" data-page="depositPage"><span class="nav-emoji">💸</span>Deposit</button>
+      <button class="nav-btn" data-page="withdrawPage"><span class="nav-emoji">🏦</span>Withdraw</button>
+      <button class="nav-btn" data-page="profilePage"><span class="nav-emoji">👤</span>Profile</button>
+    </nav>
+  </div>
+
+  <div class="modal" id="buyModal" aria-modal="true" role="dialog">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="brand-text" style="font-size:14px;">
+          Confirm Purchase
+          <small style="display:block; font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted);">Demo order</small>
+        </div>
+        <button class="close-modal" type="button" id="closeBuyModal">×</button>
+      </div>
+      <div id="buyModalBody"></div>
+      <div class="split-row" style="margin-top:16px;">
+        <button type="button" class="ghost-btn" id="cancelBuy">Cancel</button>
+        <button type="button" class="primary-btn" id="confirmBuy">Confirm Order</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" aria-live="polite"></div>
+  <div id="loader" class="loader"><div class="spinner"></div></div>
+
+  <script>
+    const STORAGE_KEY = "emerald_trade_demo_v1";
+    const pages = [...document.querySelectorAll(".page")];
+    const navButtons = [...document.querySelectorAll(".nav-btn")];
+    const authTabs = [...document.querySelectorAll(".auth-tab")];
+    const appState = {
+      currentUser: null,
+      users: [],
+      products: [],
+      orders: [],
+      transactions: [],
+      deposits: [],
+      withdrawals: [],
+      notifications: [],
+      referrals: []
+    };
+
+    const productSeed = [
+      {
+        id: "P-1001",
+        name: "Emerald Growth Plan",
+        price: 299,
+        description: "A premium digital investment package for early-stage portfolio expansion and compounding growth.",
+        details: ["High demand", "Priority access", "Market analytics"],
+        image: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        id: "P-1002",
+        name: "Stable Yield Bundle",
+        price: 499,
+        description: "Lower volatility investment bundle designed for steady returns and strategic reinvestment.",
+        details: ["Low risk", "Monthly insights", "Priority support"],
+        image: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        id: "P-1003",
+        name: "AI Signal Pack",
+        price: 899,
+        description: "Advanced AI-driven market signal package with setup guidance and performance summaries.",
+        details: ["AI signals", "Weekly brief", "VIP access"],
+        image: "https://images.unsplash.com/photo-1516321165247-4aa89a48be28?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        id: "P-1004",
+        name: "Wealth Builder Kit",
+        price: 699,
+        description: "A structured product bundle for long-term growth planning and diversified asset tracking.",
+        details: ["Diversified", "Pro tools", "Member access"],
+        image: "https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=900&q=80"
+      }
+    ];
+
+    function createInitialState() {
+      const demoUser = {
+        id: "U-20011",
+        name: "Demo Investor",
+        email: "demo@emeraldtrade.demo",
+        username: "demo_investor",
+        password: "demo1234",
+        referralCode: "EMERD10",
+        balance: 18430,
+        createdAt: new Date().toISOString()
+      };
+
+      const seedTransactions = [
+        { id: "TX-101", userId: demoUser.id, type: "deposit", amount: 2500, status: "Approved", date: "2026-10-18 12:10", description: "Primary deposit" },
+        { id: "TX-102", userId: demoUser.id, type: "purchase", amount: 299, status: "Paid", date: "2026-10-20 14:22", description: "Emerald Growth Plan" },
+        { id: "TX-103", userId: demoUser.id, type: "referral_reward", amount: 120, status: "Approved", date: "2026-10-22 11:50", description: "Referral reward" },
+        { id: "TX-104", userId: demoUser.id, type: "withdrawal", amount: 300, status: "Pending", date: "2026-10-23 09:15", description: "Bank transfer request" },
+        { id: "TX-105", userId: demoUser.id, type: "purchase", amount: 499, status: "Paid", date: "2026-10-24 16:08", description: "Stable Yield Bundle" }
+      ];
+
+      const seedDeposits = [
+        { id: "DEP-201", userId: demoUser.id, amount: 2500, method: "Bank Transfer", reference: "TRX-3201", status: "Approved", date: "2026-10-18 12:10" },
+        { id: "DEP-202", userId: demoUser.id, amount: 550, method: "USDT", reference: "USDT-1A7", status: "Pending", date: "2026-10-24 10:05" }
+      ];
+
+      const seedWithdrawals = [
+        { id: "WTH-301", userId: demoUser.id, amount: 300, method: "Bank Account", destination: "Account ending 2451", status: "Pending", date: "2026-10-23 09:15" },
+        { id: "WTH-302", userId: demoUser.id, amount: 150, method: "E-Wallet", destination: "demo-wallet-01", status: "Rejected", date: "2026-10-15 08:44" }
+      ];
+
+      const seedNotifications = [
+        { id: "N-1", userId: demoUser.id, title: "Deposit confirmed", message: "Your deposit of $2,500 was approved.", time: "2h ago", read: false },
+        { id: "N-2", userId: demoUser.id, title: "Referral reward", message: "You earned a referral bonus of $120.", time: "1d ago", read: false },
+        { id: "N-3", userId: demoUser.id, title: "System update", message: "Security review completed. Your account is active.", time: "3d ago", read: true }
+      ];
+
+      const seedReferrals = [
+        { id: "R-1", userId: demoUser.id, name: "Aisha Khan", email: "aisha@demo.com", joinedAt: "2026-10-18", reward: 50, status: "Approved" },
+        { id: "R-2", userId: demoUser.id, name: "Leo Trend", email: "leo@demo.com", joinedAt: "2026-10-20", reward: 70, status: "Pending" }
+      ];
+
+      const seedOrders = [
+        { id: "ORD-5001", userId: demoUser.id, productId: "P-1001", productName: "Emerald Growth Plan", price: 299, date: "2026-10-20 14:22", status: "Paid", details: "Priority investor package" },
+        { id: "ORD-5002", userId: demoUser.id, productId: "P-1002", productName: "Stable Yield Bundle", price: 499, date: "2026-10-24 16:08", status: "Paid", details: "Low risk growth bundle" }
+      ];
+
+      return {
+        currentUser: null,
+        users: [demoUser],
+        products: productSeed,
+        orders: seedOrders,
+        transactions: seedTransactions,
+        deposits: seedDeposits,
+        withdrawals: seedWithdrawals,
+        notifications: seedNotifications,
+        referrals: seedReferrals
+      };
+    }
+
+    function loadState() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        const initial = createInitialState();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
+        Object.assign(appState, initial);
+        return;
+      }
+      try {
+        const parsed = JSON.parse(raw);
+        Object.assign(appState, parsed);
+      } catch (error) {
+        console.error("Invalid localStorage state:", error);
+        const fallback = createInitialState();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(fallback));
+        Object.assign(appState, fallback);
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+    }
+
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: 0
+      }).format(Number(amount || 0));
+    }
+
+    function toMoney(value) {
+      return formatCurrency(value);
+    }
+
+    function showToast(message, type = "success") {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.style.borderColor = type === "error" ? "rgba(255,106,106,0.32)" : "rgba(30,240,166,0.2)";
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    function setLoading(isLoading) {
+      const loader = document.getElementById("loader");
+      if (isLoading) loader.classList.add("show");
+      else loader.classList.remove("show");
+    }
+
+    function getUserByEmail(email) {
+      return appState.users.find(user => user.email.toLowerCase() === email.toLowerCase() || user.username.toLowerCase() === email.toLowerCase());
+    }
+
+    function generateId(prefix) {
+      const stamp = Date.now().toString(36).toUpperCase();
+      const rand = Math.random().toString(36).slice(2, 7).toUpperCase();
+      return `${prefix}-${stamp}-${rand}`;
+    }
+
+    function ensureCurrentUserState() {
+      if (!appState.currentUser) return;
+      const user = appState.users.find(u => u.id === appState.currentUser.id);
+      if (user) {
+        appState.currentUser = { ...user };
+      }
+    }
+
+    function showPage(pageId) {
+      pages.forEach(page => {
+        page.classList.toggle("active", page.id === pageId);
+      });
+
+      navButtons.forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.page === pageId);
+      });
+    }
+
+    function refreshNavigation() {
+      const logged = !!appState.currentUser;
+      navButtons.forEach(button => {
+        const isVisible = logged;
+        button.style.display = isVisible ? "flex" : "none";
+      });
+      const headerUser = document.getElementById("headerUser");
+      if (!logged) {
+        headerUser.innerHTML = `<div class="avatar">D</div><span>Demo User</span>`;
+        showPage("authPage");
+      } else {
+        const user = appState.currentUser;
+        headerUser.innerHTML = `<div class="avatar">${(user.name || user.username || "D").charAt(0).toUpperCase()}</div><span>${user.name || user.username}</span>`;
+        showPage("dashboardPage");
+      }
+    }
+
+    function renderDashboardStats() {
+      const user = appState.currentUser;
+      if (!user) return;
+
+      const totalDeposit = appState.transactions
+        .filter(tx => tx.userId === user.id && tx.type === "deposit" && tx.status.toLowerCase() === "approved")
+        .reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
+
+      const totalWithdrawal = appState.transactions
+        .filter(tx => tx.userId === user.id && tx.type === "withdrawal" && tx.status.toLowerCase() === "approved")
+        .reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
+
+      const totalProductPurchases = appState.transactions
+        .filter(tx => tx.userId === user.id && tx.type === "purchase")
+        .reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
+
+      const referralRewards = appState.transactions
+        .filter(tx => tx.userId === user.id && tx.type === "referral_reward")
+        .reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
+
+      const invitedMembers = appState.referrals.filter(ref => ref.userId === user.id).length;
+
+      const stats = [
+        { label: "Available Balance", value: toMoney(user.balance || 0), meta: "Updated", trend: "up" },
+        { label: "Total Deposit", value: toMoney(totalDeposit), meta: "Approved", trend: "up" },
+        { label: "Total Withdrawal", value: toMoney(totalWithdrawal), meta: "Completed", trend: "down" },
+        { label: "Total Product Purchases", value: toMoney(totalProductPurchases), meta: "Orders", trend: "up" },
+        { label: "Referral Rewards", value: toMoney(referralRewards), meta: "Earned", trend: "up" },
+        { label: "Total Invited Members", value: String(invitedMembers), meta: "Members", trend: "up" }
+      ];
+
+      document.getElementById("dashboardStats").innerHTML = stats.map(stat => `
+        <div class="stat-card">
+          <span class="label">${stat.label}</span>
+          <div class="stat-value">${stat.value}</div>
+          <div class="stat-meta">
+            <span>${stat.meta}</span>
+            <span class="trend ${stat.trend}">${stat.trend === "up" ? "▲" : "▼"}</span>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderRecentTx() {
+      const user = appState.currentUser;
+      if (!user) return;
+      const list = appState.transactions
+        .filter(tx => tx.userId === user.id)
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(0, 5);
+
+      const container = document.getElementById("recentTxList");
+      document.getElementById("transactionBadge").textContent = list.length;
+
+      if (!list.length) {
+        container.innerHTML = `<div class="empty">No recent transactions</div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(tx => {
+        const icon = {
+          deposit: "💰",
+          withdrawal: "🏦",
+          purchase: "🛍️",
+          referral_reward: "🎁"
+        }[tx.type] || "📄";
+
+        return `
+          <div class="item">
+            <div class="item-main">
+              <div class="icon-box">${icon}</div>
+              <div class="item-text">
+                <strong>${tx.description || tx.type}</strong>
+                <small>${tx.date}</small>
+              </div>
+            </div>
+            <div>
+              <div class="amount">${tx.type === "purchase" || tx.type === "withdrawal" ? "-" : "+"}${toMoney(tx.amount)}</div>
+              <div class="status-pill status-${(tx.status || "pending").toLowerCase().replace(/\s+/g, "-")}">${tx.status}</div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderDashboardNotifications() {
+      const user = appState.currentUser;
+      if (!user) return;
+      const notifications = appState.notifications.filter(n => n.userId === user.id).slice(0, 3);
+      const container = document.getElementById("dashboardNotifications");
+      const badge = document.getElementById("notificationBadge");
+      badge.textContent = notifications.length;
+
+      if (!notifications.length) {
+        container.innerHTML = `<div class="empty">No notifications</div>`;
+        return;
+      }
+
+      container.innerHTML = notifications.map(item => `
+        <div class="item">
+          <div class="item-main">
+            <div class="icon-box">🔔</div>
+            <div class="item-text">
+              <strong>${item.title}</strong>
+              <small>${item.message}</small>
+            </div>
+          </div>
+          <div>
+            <div class="status-pill status-pending">${item.time}</div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderProducts() {
+      const container = document.getElementById("productGrid");
+      if (!appState.products.length) {
+        container.innerHTML = `<div class="empty">No products available.</div>`;
+        return;
+      }
+
+      container.innerHTML = appState.products.map(product => `
+        <article class="product-card">
+          <div class="product-image" style="background-image:url('${product.image}')">
+            <span class="product-chip">Featured</span>
+          </div>
+          <div class="product-body">
+            <div class="product-header">
+              <div>
+                <h3 class="product-name">${product.name}</h3>
+                <div class="product-id">${product.id}</div>
+              </div>
+              <div class="product-price">${toMoney(product.price)}</div>
+            </div>
+            <div class="product-desc">${product.description}</div>
+            <div class="product-details">
+              ${product.details.map(detail => `<span class="product-detail">${detail}</span>`).join("")}
+            </div>
+            <button class="primary-btn buy-product" data-product-id="${product.id}" type="button">Buy Now</button>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function renderDepositHistory() {
+      const user = appState.currentUser;
+      if (!user) return;
+      const deposits = appState.deposits.filter(item => item.userId === user.id).slice().reverse();
+      const container = document.getElementById("depositHistory");
+      if (!deposits.length) {
+        container.innerHTML = `<div class="empty">No deposit history yet.</div>`;
+        return;
+      }
+
+      container.innerHTML = deposits.map(item => `
+        <div class="item">
+          <div class="item-main">
+            <div class="icon-box">💳</div>
+            <div class="item-text">
+              <strong>${item.method}</strong>
+              <small>${item.reference}</small>
+            </div>
+          </div>
+          <div>
+            <div class="amount">${toMoney(item.amount)}</div>
+            <div class="status-pill status-${(item.status || "pending").toLowerCase().replace(/\s+/g, "-")}">${item.status}</div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderWithdrawHistory() {
+      const user = appState.currentUser;
+      if (!user) return;
+      const withdrawals = appState.withdrawals.filter(item => item.userId === user.id).slice().reverse();
+      const container = document.getElementById("withdrawHistory");
+      if (!withdrawals.length) {
+        container.innerHTML = `<div class="empty">No withdrawal history yet.</div>`;
+        return;
+      }
+
+      container.innerHTML = withdrawals.map(item => `
+        <div class="item">
+          <div class="item-main">
+            <div class="icon-box">🏦</div>
+            <div class="item-text">
+              <strong>${item.method}</strong>
+              <small>${item.destination}</small>
+            </div>
+          </div>
+          <div>
+            <div class="amount">${toMoney(item.amount)}</div>
+            <div class="status-pill status-${(item.status || "pending").toLowerCase().replace(/\s+/g, "-")}">${item.status}</div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderReferralPage() {
+      const user = appState.currentUser;
+      if (!user) return;
+
+      const refCode = document.getElementById("refCodeDisplay");
+      const refLink = document.getElementById("refLinkDisplay");
+
+      refCode.value = user.referralCode || "EMERD10";
+      refLink.value = `https://example.com/register?ref=${user.referralCode || "EMERD10"}`;
+
+      const referralList = appState.referrals.filter(item => item.userId === user.id);
+
+      document.getElementById("refStats").innerHTML = `
+        <span class="mini-pill">Code: ${user.referralCode}</span>
+        <span class="mini-pill">Invited: ${referralList.length}</span>
+        <span class="mini-pill">Rewards: ${toMoney(referralList.reduce((sum, item) => sum + Number(item.reward || 0), 0))}</span>
+      `;
+
+      const membersList = document.getElementById("invitedMembersList");
+      membersList.innerHTML = referralList.length
+        ? referralList.map(item => `
+          <div class="item">
+            <div class="item-main">
+              <div class="icon-box">👤</div>
+              <div class="item-text">
+                <strong>${item.name}</strong>
+                <small>${item.email}</small>
+              </div>
+            </div>
+            <div>
+              <div class="amount">${toMoney(item.reward || 0)}</div>
+              <div class="status-pill status-${(item.status || "pending").toLowerCase().replace(/\s+/g, "-")}">${item.status}</div>
+            </div>
+          </div>
+        `).join("")
+        : `<div class="empty">No invited members yet.</div>`;
+
+      const rewardHistory = document.getElementById("rewardHistory");
+      const rewardTx = appState.transactions.filter(tx => tx.userId === user.id && tx.type === "referral_reward").slice().reverse();
+      rewardHistory.innerHTML = rewardTx.length
+        ? rewardTx.map(tx => `
+          <div class="item">
+            <div class="item-main">
+              <div class="icon-box">🎁</div>
+              <div class="item-text">
+                <strong>${tx.description}</strong>
+                <small>${tx.date}</small>
+              </div>
+            </div>
+            <div>
+              <div class="amount">${toMoney(tx.amount)}</div>
+              <div class="status-pill status-${(tx.status || "pending").toLowerCase().replace(/\s+/g, "-")}">${tx.status}</div>
+            </div>
+          </div>
+        `).join("")
+        : `<div class="empty">No referral rewards yet.</div>`;
+    }
+
+    function renderOrders() {
+      const user = appState.currentUser;
+      if (!user) return;
+      const list = appState.orders.filter(order => order.userId === user.id).slice().reverse();
+      const container = document.getElementById("ordersList");
+      document.getElementById("myProductsCount").textContent = list.length;
+
+      if (!list.length) {
+        container.innerHTML = `<div class="empty">No purchase history yet. Visit the marketplace to buy a product.</div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(order => `
+        <div class="item">
+          <div class="item-main">
+            <div class="icon-box">📦</div>
+            <div class="item-text">
+              <strong>${order.productName}</strong>
+              <small>Order ID: ${order.id} • ${order.date}</small>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div class="amount">${toMoney(order.price)}</div>
+            <div class="status-pill status-${(order.status || "pending").toLowerCase().replace(/\s+/g, "-")}">${order.status}</div>
+            <div style="font-size:11px; color:var(--muted); margin-top:6px;">${order.details}</div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderTransactionsTable() {
+      const user = appState.currentUser;
+      if (!user) return;
+
+      const searchTerm = document.getElementById("transactionSearch").value.trim().toLowerCase();
+      const filter = document.getElementById("transactionFilter").value;
+
+      let filtered = appState.transactions.filter(tx => tx.userId === user.id);
+
+      if (filter !== "all") filtered = filtered.filter(tx => tx.type === filter);
+      if (searchTerm) {
+        filtered = filtered.filter(tx =>
+          String(tx.id).toLowerCase().includes(searchTerm) ||
+          String(tx.type).toLowerCase().includes(searchTerm) ||
+          String(tx.description || "").toLowerCase().includes(searchTerm)
+        );
+      }
+
+      const tbody = document.getElementById("transactionsTableBody");
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="5"><div class="empty">No transactions match your search.</div></td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.slice().reverse().map(tx => `
+        <tr>
+          <td>${tx.id}</td>
+          <td>${tx.type}</td>
+          <td>${toMoney(tx.amount)}</td>
+          <td><span class="status-pill status-${(tx.status || "pending").toLowerCase().replace(/\s+/g, "-")}">${tx.status}</span></td>
+          <td>${tx.date}</td>
+        </tr>
+      `).join("");
+    }
+
+    function renderProfile() {
+      const user = appState.currentUser;
+      if (!user) return;
+
+      const profilePanel = document.getElementById("profilePanel");
+      const totalRewards = appState.transactions
+        .filter(tx => tx.userId === user.id && tx.type === "referral_reward")
+        .reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
+
+      profilePanel.innerHTML = `
+        <div class="stats-strip">
+          <span class="mini-pill">User ID: ${user.id}</span>
+          <span class="mini-pill">Demo Mode</span>
+          <span class="mini-pill">Ref: ${user.referralCode}</span>
+        </div>
+
+        <div class="helper-list" style="margin-top:12px;">
+          <div class="helper-item">
+            <h4>${user.name}</h4>
+            <p>
+              Username: ${user.username}<br />
+              Email: ${user.email}<br />
+              Balance: ${toMoney(user.balance)}<br />
+              Rewards: ${toMoney(totalRewards)}
+            </p>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderNotifications() {
+      const user = appState.currentUser;
+      if (!user) return;
+      const notifications = appState.notifications.filter(n => n.userId === user.id);
+      const fullList = document.getElementById("fullNotificationsList");
+      const count = document.getElementById("notiCount");
+      count.textContent = notifications.length;
+
+      if (!notifications.length) {
+        fullList.innerHTML = `<div class="empty">No notifications.</div>`;
+        return;
+      }
+
+      fullList.innerHTML = notifications.map(item => `
+        <div class="item">
+          <div class="item-main">
+            <div class="icon-box">🔔</div>
+            <div class="item-text">
+              <strong>${item.title}</strong>
+              <small>${item.message}</small>
+            </div>
+          </div>
+          <div>
+            <div class="status-pill status-${item.read ? "approved" : "pending"}">${item.read ? "Read" : "New"}</div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderAll() {
+      ensureCurrentUserState();
+      const logged = !!appState.currentUser;
+
+      if (logged) {
+        renderDashboardStats();
+        renderRecentTx();
+        renderDashboardNotifications();
+        renderProducts();
+        renderDepositHistory();
+        renderWithdrawHistory();
+        renderReferralPage();
+        renderOrders();
+        renderTransactionsTable();
+        renderProfile();
+        renderNotifications();
+      }
+    }
+
+    function loginUser(email, password) {
+      const existing = getUserByEmail(email);
+
+      if (!existing) {
+        showToast("User not found. Please register or use demo account.", "error");
+        return;
+      }
+
+      if (existing.password !== password) {
+        showToast("Incorrect password. Use the demo account or reset demo data.", "error");
+        return;
+      }
+
+      appState.currentUser = { ...existing };
+      saveState();
+      refreshNavigation();
+      renderAll();
+      showToast("Login successful. Demo session activated.");
+    }
+
+    function registerUser(data) {
+      const fullName = (data.name || "").trim();
+      const email = (data.email || "").trim();
+      const username = (data.username || "").trim();
+      const password = (data.password || "").trim();
+      const refCode = (data.ref || "").trim().toUpperCase();
+
+      if (!fullName || !email || !username || !password) {
+        showToast("All fields are required.", "error");
+        return;
+      }
+      if (password.length < 6) {
+        showToast("Password must be at least 6 characters.", "error");
+        return;
+      }
+      if (appState.users.some(user => user.email.toLowerCase() === email.toLowerCase() || user.username.toLowerCase() === username.toLowerCase())) {
+        showToast("This email or username already exists.", "error");
+        return;
+      }
+
+      const newUser = {
+        id: `U-${Math.floor(10000 + Math.random() * 90000)}`,
+        name: fullName,
+        email,
+        username,
+        password,
+        referralCode: refCode || `EMERD${Math.floor(100 + Math.random() * 900)}`,
+        balance: 2500,
+        createdAt: new Date().toISOString()
+      };
+
+      appState.users.push(newUser);
+      appState.currentUser = { ...newUser };
+      appState.notifications.push({
+        id: generateId("N"),
+        userId: newUser.id,
+        title: "Welcome aboard",
+        message: "Your demo account has been created successfully.",
+        time: "Just now",
+        read: false
+      });
+      saveState();
+      refreshNavigation();
+      renderAll();
+      showToast("Demo account created successfully.");
+    }
+
+    function handleBuyProduct(productId) {
+      const product = appState.products.find(item => item.id === productId);
+      if (!product) return;
+
+      const modal = document.getElementById("buyModal");
+      const body = document.getElementById("buyModalBody");
+      body.innerHTML = `
+        <div class="helper-item">
+          <h4>${product.name}</h4>
+          <p>Product ID: ${product.id}</p>
+          <p>Price: ${toMoney(product.price)}</p>
+          <p>Note: Demo mode creates a sample order. No real payment is taken.</p>
+        </div>
+      `;
+      modal.classList.add("show");
+      modal.dataset.productId = product.id;
+    }
+
+    function confirmBuy() {
+      const modal = document.getElementById("buyModal");
+      const productId = modal.dataset.productId;
+      const product = appState.products.find(item => item.id === productId);
+      const user = appState.currentUser;
+
+      if (!product || !user) {
+        showToast("Unable to complete purchase.", "error");
+        return;
+      }
+
+      const orderId = `ORD-${Math.floor(1000 + Math.random() * 9000)}`;
+      const now = new Date();
+      const order = {
+        id: orderId,
+        userId: user.id,
+        productId: product.id,
+        productName: product.name,
+        price: product.price,
+        date: now.toLocaleString("en-GB", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }).replace(",", ""),
+        status: "Paid",
+        details: "Demo purchase is created successfully."
+      };
+
+      appState.orders.push(order);
+      appState.transactions.push({
+        id: `TX-${Math.floor(10000 + Math.random() * 90000)}`,
+        userId: user.id,
+        type: "purchase",
+        amount: product.price,
+        status: "Paid",
+        date: now.toLocaleString("en-GB", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }).replace(",", ""),
+        description: product.name
+      });
+
+      user.balance = Number(user.balance || 0) - Number(product.price);
+      const targetUser = appState.users.find(item => item.id === user.id);
+      if (targetUser) targetUser.balance = Number(targetUser.balance || 0) - Number(product.price);
+
+      appState.notifications.push({
+        id: generateId("N"),
+        userId: user.id,
+        title: "Order completed",
+        message: `Your demo order for ${product.name} has been created.`,
+        time: "Just now",
+        read: false
+      });
+
+      saveState();
+      renderAll();
+      modal.classList.remove("show");
+      showToast("Sample purchase created under My Products.");
+    }
+
+    function submitDeposit(event) {
+      event.preventDefault();
+      const amount = Number(document.getElementById("depositAmount").value);
+      const method = document.getElementById("depositMethod").value.trim();
+      const reference = document.getElementById("depositReference").value.trim();
+
+      if (!amount || amount < 10) {
+        showToast("Deposit amount must be at least $10.", "error");
+        return;
+      }
+      if (!method) {
+        showToast("Select a payment method.", "error");
+        return;
+      }
+      if (!reference) {
+        showToast("Enter a transaction reference.", "error");
+        return;
+      }
+
+      const user = appState.currentUser;
+      if (!user) {
+        showToast("Please log in to submit a deposit request.", "error");
+        return;
+      }
+
+      setLoading(true);
+
+      setTimeout(() => {
+        const entry = {
+          id: `DEP-${Math.floor(1000 + Math.random() * 9000)}`,
+          userId: user.id,
+          amount,
+          method,
+          reference,
+          status: "Pending",
+          date: new Date().toLocaleString("en-GB", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }).replace(",", "")
+        };
+
+        appState.deposits.push(entry);
+        appState.transactions.push({
+          id: `TX-${Math.floor(10000 + Math.random() * 90000)}`,
+          userId: user.id,
+          type: "deposit",
+          amount,
+          status: "Pending",
+          date: entry.date,
+          description: `Deposit request via ${method}`
+        });
+
+        appState.notifications.push({
+          id: generateId("N"),
+          userId: user.id,
+          title: "Deposit request sent",
+          message: `Your ${toMoney(amount)} deposit request is pending approval.`,
+          time: "Just now",
+          read: false
+        });
+
+        saveState();
+        renderAll();
+        document.getElementById("depositForm").reset();
+        setLoading(false);
+        showToast("Deposit request submitted successfully in demo mode.");
+      }, 600);
+    }
+
+    function submitWithdrawal(event) {
+      event.preventDefault();
+      const amount = Number(document.getElementById("withdrawAmount").value);
+      const method = document.getElementById("withdrawMethod").value.trim();
+      const destination = document.getElementById("withdrawDestination").value.trim();
+
+      if (!amount || amount < 100) {
+        showToast("Withdrawal amount must be at least $100.", "error");
+        return;
+      }
+      if (!method) {
+        showToast("Select a withdrawal method.", "error");
+        return;
+      }
+      if (!destination) {
+        showToast("Enter destination details.", "error");
+        return;
+      }
+
+      const user = appState.currentUser;
+      if (!user) {
+        showToast("Please log in to submit a withdrawal request.", "error");
+        return;
+      }
+
+      setLoading(true);
+
+      setTimeout(() => {
+        const entry = {
+          id: `WTH-${Math.floor(1000 + Math.random() * 9000)}`,
+          userId: user.id,
+          amount,
+          method,
+          destination,
+          status: "Pending",
+          date: new Date().toLocaleString("en-GB", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }).replace(",", "")
+        };
+
+        appState.withdrawals.push(entry);
+        appState.transactions.push({
+          id: `TX-${Math.floor(10000 + Math.random() * 90000)}`,
+          userId: user.id,
+          type: "withdrawal",
+          amount,
+          status: "Pending",
+          date: entry.date,
+          description: `Withdrawal via ${method}`
+        });
+
+        appState.notifications.push({
+          id: generateId("N"),
+          userId: user.id,
+          title: "Withdrawal request sent",
+          message: `Your ${toMoney(amount)} withdrawal request is pending review.`,
+          time: "Just now",
+          read: false
+        });
+
+        saveState();
+        renderAll();
+        document.getElementById("withdrawForm").reset();
+        setLoading(false);
+        showToast("Withdrawal request submitted. No real transfer was made.");
+      }, 600);
+    }
+
+    function copyReferralLink() {
+      const value = document.getElementById("refLinkDisplay").value;
+      if (!value) {
+        showToast("Referral link not available.", "error");
+        return;
+      }
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(value).then(() => {
+          showToast("Referral link copied.");
+        }).catch(() => {
+          showToast("Copy failed. You can copy manually.", "error");
+        });
+      } else {
+        document.getElementById("refLinkDisplay").select();
+        document.execCommand("copy");
+        showToast("Referral link copied.");
+      }
+    }
+
+    function resetDemoData() {
+      if (!confirm("Reset all demo data? This will restore the preset demo state.")) return;
+      const resetState = createInitialState();
+      Object.assign(appState, resetState);
+      appState.currentUser = null;
+      saveState();
+      refreshNavigation();
+      showToast("Demo data reset successfully.");
+      document.getElementById("resetDemoDataBtn").blur();
+    }
+
+    function logout() {
+      appState.currentUser = null;
+      saveState();
+      refreshNavigation();
+      showToast("Logged out. Demo session ended.");
+    }
+
+    function bindEvents() {
+      navButtons.forEach(button => {
+        button.addEventListener("click", () => {
+          const targetPage = button.dataset.page;
+          if (appState.currentUser || targetPage === "authPage") {
+            showPage(targetPage);
+          } else {
+            showPage("authPage");
+          }
+        });
+      });
+
+      document.querySelectorAll(".quick-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const page = btn.dataset.page;
+          if (appState.currentUser) showPage(page);
+        });
+      });
+
+      document.querySelectorAll(".auth-tab").forEach(tab => {
+        tab.addEventListener("click", () => {
+          const target = tab.dataset.auth;
+          document.querySelectorAll(".auth-form").forEach(form => {
+            form.classList.toggle("active", form.id === (`${target}Form`));
+          });
+          document.querySelectorAll(".auth-tab").forEach(t => t.classList.toggle("active", t === tab));
+        });
+      });
+
+      document.getElementById("useDemoAccountBtn").addEventListener("click", () => {
+        document.getElementById("loginEmail").value = "demo@emeraldtrade.demo";
+        document.getElementById("loginPassword").value = "demo1234";
+      });
+
+      document.getElementById("demoModeBtn").addEventListener("click", () => {
+        showToast("Demo mode active. Use the demo account to explore the panel.");
+      });
+
+      document.getElementById("loginForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const email = document.getElementById("loginEmail").value.trim();
+        const password = document.getElementById("loginPassword").value.trim();
+        loginUser(email, password);
+      });
+
+      document.getElementById("registerForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const formData = {
+          name: document.getElementById("regName").value,
+          email: document.getElementById("regEmail").value,
+          username: document.getElementById("regUsername").value,
+          password: document.getElementById("regPassword").value,
+          ref: document.getElementById("regRef").value
+        };
+        registerUser(formData);
+      });
+
+      document.addEventListener("click", (event) => {
+        const buyBtn = event.target.closest(".buy-product");
+        if (buyBtn) {
+          handleBuyProduct(buyBtn.dataset.productId);
+        }
+      });
+
+      document.getElementById("closeBuyModal").addEventListener("click", () => {
+        document.getElementById("buyModal").classList.remove("show");
+      });
+
+      document.getElementById("cancelBuy").addEventListener("click", () => {
+        document.getElementById("buyModal").classList.remove("show");
+      });
+
+      document.getElementById("confirmBuy").addEventListener("click", confirmBuy);
+
+      document.getElementById("depositForm").addEventListener("submit", submitDeposit);
+      document.getElementById("withdrawForm").addEventListener("submit", submitWithdrawal);
+
+      document.getElementById("copyReferralBtn").addEventListener("click", copyReferralLink);
+      document.getElementById("shareReferralBtn").addEventListener("click", () => {
+        const val = document.getElementById("refLinkDisplay").value;
+        if (!val) {
+          showToast("No referral link available", "error");
+          return;
+        }
+        if (navigator.share) {
+          navigator.share({
+            title: "EmeraldTrade Referral",
+            text: "Join me on EmeraldTrade",
+            url: val
+          }).catch(() => showToast("Share cancelled."));
+        } else {
+          copyReferralLink();
+        }
+      });
+
+      document.getElementById("logoutBtn").addEventListener("click", logout);
+      document.getElementById("resetDemoDataBtn").addEventListener("click", resetDemoData);
+
+      document.getElementById("transactionSearch").addEventListener("input", renderTransactionsTable);
+      document.getElementById("transactionFilter").addEventListener("change", renderTransactionsTable);
+
+      document.getElementById("buyModal").addEventListener("click", (event) => {
+        if (event.target.id === "buyModal") {
+          document.getElementById("buyModal").classList.remove("show");
+        }
+      });
+    }
+
+    function initialize() {
+      loadState();
+      bindEvents();
+      refreshNavigation();
+      renderAll();
+    }
+
+    initialize();
+  </script>
+</body>
+</html>
