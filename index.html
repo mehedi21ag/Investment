@@ -1,2267 +1,1832 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>EmeraldTrade | User Panel Demo</title>
-  <style>
-    :root {
-      --bg: #050b0d;
-      --bg-2: #0e1719;
-      --panel: rgba(15, 25, 27, 0.9);
-      --panel-2: rgba(17, 31, 31, 0.95);
-      --card: #0d1718;
-      --soft: #0f2527;
-      --line: rgba(63, 255, 183, 0.18);
-      --emerald: #1ef0a6;
-      --emerald-2: #13b889;
-      --emerald-3: #8cf5d4;
-      --danger: #ff6a6a;
-      --warning: #ffd166;
-      --text: #ebfff9;
-      --muted: #8ab6a8;
-      --shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
-      --radius: 18px;
-    }
-
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background: radial-gradient(circle at top, #0d201d 0%, #060b0d 40%, #030707 100%);
-      color: var(--text);
-      min-height: 100vh;
-    }
-
-    a { color: inherit; text-decoration: none; }
-    button, input, select, textarea {
-      font: inherit;
-    }
-
-    .emerald-demo {
-      max-width: 540px;
-      min-height: 100vh;
-      margin: 0 auto;
-      background: linear-gradient(180deg, rgba(5,11,13,0.98), rgba(4,10,11,0.97));
-      position: relative;
-      padding-bottom: 90px;
-      overflow: hidden;
-    }
-
-    .emerald-demo::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(circle at 10% 0%, rgba(30, 240, 166, 0.18), transparent 30%),
-        radial-gradient(circle at 90% 40%, rgba(19, 184, 137, 0.16), transparent 28%);
-      pointer-events: none;
-    }
-
-    .demo-banner {
-      margin: 10px 16px 0;
-      background: rgba(15, 39, 35, 0.7);
-      border: 1px solid var(--line);
-      color: var(--emerald-3);
-      border-radius: 12px;
-      padding: 10px 12px;
-      font-size: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      position: relative;
-      z-index: 1;
-    }
-    .demo-banner .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--emerald); box-shadow: 0 0 12px rgba(30, 240, 166, 0.9); }
-
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      backdrop-filter: blur(16px);
-      background: rgba(6, 11, 13, 0.7);
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-      padding: 14px 16px 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: relative;
-      z-index: 1;
-    }
-
-    .brand-wrap {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .brand-mark {
-      width: 38px; height: 38px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, var(--emerald), #0d5144);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; font-weight: 700; color: #03241b;
-      box-shadow: 0 10px 20px rgba(19, 184, 137, 0.35);
-    }
-
-    .brand-text {
-      font-weight: 700;
-      letter-spacing: 0.03em;
-    }
-    .brand-text small {
-      display: block;
-      color: var(--muted);
-      font-size: 10px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-    }
-
-    .header-user {
-      display: flex; align-items: center; gap: 8px;
-      padding: 8px 12px;
-      background: rgba(14, 23, 24, 0.8);
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      color: var(--text);
-      font-size: 12px;
-      max-width: 180px;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-
-    .header-user .avatar {
-      width: 24px; height: 24px; border-radius: 50%;
-      background: linear-gradient(135deg, #1ef0a6, #0d8a66);
-      display: flex; align-items:center; justify-content:center;
-      font-size: 11px; font-weight: 700; color: #021b14;
-    }
-
-    .page {
-      display: none;
-      animation: fadeUp 0.3s ease-in-out;
-      position: relative;
-      z-index: 1;
-      padding: 16px;
-    }
-    .page.active { display: block; }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .section-title {
-      margin: 10px 0 12px;
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: rgba(30, 240, 166, 0.1);
-      border: 1px solid rgba(30,240,166,0.2);
-      color: var(--emerald-3);
-      font-size: 11px;
-      font-weight: 600;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap: 12px;
-      margin-top: 10px;
-    }
-
-    .stat-card, .card, .panel, .empty {
-      background: linear-gradient(180deg, rgba(17,26,27,0.92), rgba(12,17,18,0.9));
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-    }
-
-    .stat-card {
-      padding: 16px 14px 14px;
-      min-height: 120px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .stat-card::after {
-      content: "";
-      position: absolute;
-      width: 90px;
-      height: 90px;
-      right: -18px;
-      top: -20px;
-      background: radial-gradient(circle, rgba(30,240,166,0.18) 0%, rgba(30,240,166,0.02) 60%, transparent 100%);
-      border-radius: 50%;
-    }
-
-    .label {
-      font-size: 11px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 10px;
-      display: block;
-    }
-
-    .stat-value {
-      font-weight: 800;
-      font-size: clamp(1.5rem, 4vw, 2rem);
-      letter-spacing: -0.04em;
-      margin-bottom: 4px;
-    }
-
-    .stat-meta {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 11px;
-      color: var(--muted);
-    }
-
-    .trend.up { color: var(--emerald-3); }
-    .trend.down { color: #ff9c9c; }
-
-    .card {
-      padding: 16px;
-      margin-top: 16px;
-    }
-
-    .tx-list, .notif-list, .mini-list, .table-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-top: 12px;
-    }
-
-    .item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      background: rgba(10,18,19,0.8);
-      border: 1px solid rgba(255,255,255,0.04);
-      border-radius: 14px;
-      padding: 12px 12px;
-    }
-
-    .item-main {
-      display: flex; align-items: center; gap: 10px;
-      min-width: 0;
-      flex: 1;
-    }
-
-    .icon-box {
-      width: 38px; height: 38px;
-      border-radius: 12px;
-      display: flex; align-items:center; justify-content:center;
-      font-size: 18px;
-      background: rgba(30,240,166,0.08);
-      border: 1px solid rgba(30,240,166,0.18);
-      flex-shrink: 0;
-    }
-
-    .item-text { min-width: 0; flex: 1; }
-    .item-text strong {
-      display: block;
-      font-size: 14px;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .item-text small {
-      display: block;
-      color: var(--muted);
-      font-size: 11px;
-      margin-top: 4px;
-    }
-
-    .amount {
-      font-weight: 700;
-      font-size: 15px;
-      text-align: right;
-      white-space: nowrap;
-    }
-
-    .status-pill {
-      display: inline-block;
-      padding: 6px 9px;
-      border-radius: 999px;
-      font-size: 10px;
-      line-height: 1;
-      font-weight: 700;
-      border: 1px solid transparent;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .status-approved { background: rgba(30,240,166,0.1); color: var(--emerald-3); border-color: rgba(30,240,166,0.2); }
-    .status-pending { background: rgba(255,209,102,0.1); color: var(--warning); border-color: rgba(255,209,102,0.25); }
-    .status-rejected { background: rgba(255,106,106,0.12); color: #ffb0b0; border-color: rgba(255,106,106,0.25); }
-    .status-paid { background: rgba(30,240,166,0.08); color: var(--emerald-3); border-color: rgba(30,240,166,0.2); }
-    .status-processing { background: rgba(142,188,255,0.1); color: #bbd5ff; border-color: rgba(142,188,255,0.2); }
-
-    .quick-actions {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0,1fr));
-      gap: 10px;
-      margin-top: 14px;
-    }
-    .quick-btn {
-      border: 1px solid var(--line);
-      background: linear-gradient(180deg, rgba(17,26,27,0.92), rgba(12,17,18,0.9));
-      color: var(--text);
-      border-radius: 14px;
-      padding: 12px 8px;
-      font-size: 12px;
-      font-weight: 600;
-      min-height: 72px;
-      display: flex; flex-direction: column; align-items:center; justify-content:center; gap:6px;
-      cursor: pointer;
-      transition: transform 0.2s ease, border-color 0.2s ease;
-    }
-    .quick-btn:active { transform: scale(0.98); }
-    .quick-btn:hover { border-color: rgba(30,240,166,0.28); }
-
-    .quick-btn .emoji {
-      font-size: 20px;
-      width: 38px; height: 38px; display:flex; align-items:center; justify-content:center;
-      border-radius: 11px; background: rgba(30,240,166,0.08);
-    }
-
-    .panel {
-      padding: 16px;
-      margin-top: 16px;
-    }
-
-    .grid2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .field-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-    .field-group label {
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 600;
-    }
-    .field-group input,
-    .field-group select,
-    .field-group textarea {
-      width: 100%;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(10,17,18,0.9);
-      color: var(--text);
-      border-radius: 12px;
-      padding: 12px 14px;
-      outline: none;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    .field-group textarea { min-height: 110px; resize: vertical; }
-    .field-group input:focus, .field-group select:focus, .field-group textarea:focus {
-      border-color: rgba(30,240,166,0.32);
-      box-shadow: 0 0 0 4px rgba(30,240,166,0.07);
-    }
-
-    .primary-btn, .secondary-btn, .ghost-btn {
-      border: none;
-      cursor: pointer;
-      transition: transform 0.2s ease, opacity 0.2s ease;
-      border-radius: 12px;
-      font-weight: 700;
-    }
-
-    .primary-btn {
-      width: 100%;
-      padding: 14px 16px;
-      color: #031b14;
-      background: linear-gradient(135deg, var(--emerald), #56f9c7);
-      box-shadow: 0 12px 22px rgba(30,240,166,0.18);
-    }
-    .secondary-btn {
-      padding: 12px 16px;
-      background: rgba(30,240,166,0.1);
-      border: 1px solid rgba(30,240,166,0.2);
-      color: var(--emerald-3);
-    }
-    .ghost-btn {
-      padding: 12px 16px;
-      background: transparent;
-      border: 1px solid rgba(255,255,255,0.08);
-      color: var(--text);
-    }
-
-    .primary-btn:active, .secondary-btn:active, .ghost-btn:active { transform: scale(0.99); }
-
-    .split-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 12px;
-    }
-
-    .split-row > * { flex: 1; }
-
-    .form-link {
-      color: var(--emerald-3);
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .auth-shell {
-      min-height: calc(100vh - 120px);
-      display: flex; align-items: center; justify-content: center;
-      padding: 18px 16px 90px;
-    }
-
-    .auth-card {
-      width: 100%;
-      background: linear-gradient(180deg, rgba(16,24,27,0.94), rgba(8,13,15,0.96));
-      border: 1px solid var(--line);
-      border-radius: 26px;
-      box-shadow: var(--shadow);
-      padding: 18px 16px 16px;
-    }
-
-    .auth-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 16px;
-    }
-
-    .auth-tabs {
-      display: flex;
-      background: rgba(11,16,17,0.8);
-      border: 1px solid rgba(255,255,255,0.05);
-      border-radius: 999px;
-      padding: 4px;
-      gap: 4px;
-      width: 100%;
-    }
-
-    .auth-tab {
-      flex: 1;
-      padding: 10px 12px;
-      border-radius: 999px;
-      background: transparent;
-      border: none;
-      color: var(--muted);
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .auth-tab.active {
-      background: linear-gradient(135deg, rgba(30,240,166,0.18), rgba(30,240,166,0.05));
-      color: var(--emerald-3);
-      border: 1px solid rgba(30,240,166,0.2);
-    }
-
-    .auth-form {
-      display: none;
-      margin-top: 16px;
-      animation: fadeUp 0.25s ease;
-    }
-    .auth-form.active { display: block; }
-
-    .tiny-note {
-      margin-top: 12px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.6;
-    }
-
-    .demo-user-box {
-      background: rgba(30,240,166,0.08);
-      border: 1px solid rgba(30,240,166,0.16);
-      border-radius: 14px;
-      padding: 12px;
-      color: var(--emerald-3);
-      font-size: 12px;
-      margin-top: 12px;
-    }
-
-    .stats-strip {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-    .mini-pill {
-      padding: 8px 10px;
-      border-radius: 999px;
-      background: rgba(11,16,17,0.9);
-      border: 1px solid rgba(255,255,255,0.04);
-      color: var(--muted);
-      font-size: 11px;
-      white-space: nowrap;
-    }
-
-    .list-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 12px;
-    }
-    .list-table th, .list-table td {
-      padding: 10px 8px;
-      text-align: left;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      font-size: 12px;
-      color: var(--text);
-    }
-    .list-table th {
-      color: var(--muted);
-      font-size: 11px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-    }
-
-    .product-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 14px;
-      margin-top: 12px;
-    }
-
-    .product-card {
-      background: linear-gradient(180deg, rgba(16,23,25,0.96), rgba(10,15,16,0.92));
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      overflow: hidden;
-      box-shadow: var(--shadow);
-    }
-    .product-image {
-      height: 172px;
-      background-size: cover;
-      background-position: center;
-      position: relative;
-    }
-    .product-chip {
-      position: absolute;
-      top: 12px; left: 12px;
-      background: rgba(4, 15, 14, 0.75);
-      border: 1px solid rgba(30,240,166,0.2);
-      color: var(--emerald-3);
-      padding: 6px 8px; border-radius: 999px; font-size: 10px; font-weight: 700;
-    }
-    .product-body {
-      padding: 14px;
-    }
-    .product-header {
-      display: flex;
-      align-items: start;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 8px;
-    }
-    .product-name {
-      font-weight: 800;
-      font-size: 1.05rem;
-      margin: 0;
-      line-height: 1.3;
-    }
-    .product-price {
-      font-size: 1.1rem;
-      font-weight: 800;
-      color: var(--emerald-3);
-      white-space: nowrap;
-    }
-    .product-id {
-      color: var(--muted);
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      margin: 4px 0 8px;
-      text-transform: uppercase;
-    }
-    .product-desc {
-      color: var(--muted);
-      line-height: 1.6;
-      font-size: 13px;
-      margin-bottom: 10px;
-    }
-    .product-details {
-      display: flex; flex-wrap: wrap; gap: 8px;
-      margin-bottom: 12px;
-    }
-    .product-detail {
-      background: rgba(19,31,31,0.9);
-      border: 1px solid rgba(255,255,255,0.05);
-      color: var(--muted);
-      border-radius: 999px; padding: 6px 8px; font-size: 10px;
-    }
-
-    .empty {
-      padding: 18px 14px;
-      text-align: center;
-      color: var(--muted);
-      margin-top: 12px;
-    }
-
-    .bottom-nav {
-      position: fixed;
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: max(12px, env(safe-area-inset-bottom));
-      width: min(540px, calc(100% - 16px));
-      background: rgba(8,15,17,0.82);
-      border: 1px solid rgba(30,240,166,0.16);
-      backdrop-filter: blur(18px);
-      border-radius: 20px;
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0,1fr));
-      gap: 8px;
-      padding: 8px;
-      box-shadow: 0 12px 28px rgba(0,0,0,0.25);
-      z-index: 50;
-    }
-
-    .nav-btn {
-      border: none;
-      background: transparent;
-      color: var(--muted);
-      padding: 10px 8px 8px;
-      border-radius: 14px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      cursor: pointer;
-      font-size: 10px;
-      font-weight: 700;
-      min-height: 56px;
-      transition: all 0.2s ease;
-    }
-
-    .nav-btn.active {
-      background: linear-gradient(135deg, rgba(30,240,166,0.18), rgba(30,240,166,0.08));
-      color: var(--emerald-3);
-      border: 1px solid rgba(30,240,166,0.2);
-    }
-    .nav-btn .nav-emoji { font-size: 18px; }
-
-    .helper-list {
-      display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
-    .helper-item {
-      background: rgba(12,17,18,0.8); border: 1px solid rgba(255,255,255,0.04);
-      border-radius: 14px; padding: 12px;
-    }
-    .helper-item h4 {
-      margin: 0 0 6px; font-size: 15px;
-    }
-    .helper-item p {
-      color: var(--muted); line-height: 1.7; margin: 0; font-size: 13px;
-    }
-
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(3,8,8,0.72);
-      display: none;
-      align-items: end;
-      justify-content: center;
-      z-index: 80;
-      padding: 18px 12px;
-    }
-    .modal.show { display: flex; }
-    .modal-card {
-      width: min(540px, 100%);
-      background: linear-gradient(180deg, rgba(15,22,24,0.98), rgba(8,12,13,1));
-      border: 1px solid var(--line);
-      border-radius: 22px 22px 18px 18px;
-      padding: 18px 16px 16px;
-      box-shadow: var(--shadow);
-      animation: slideUp 0.25s ease;
-    }
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .modal-header {
-      display: flex; align-items:center; justify-content:space-between; gap: 12px;
-      margin-bottom: 8px;
-    }
-    .close-modal {
-      border: none; background: rgba(255,255,255,0.04); color: var(--text);
-      width: 32px; height: 32px; border-radius: 50%; cursor:pointer;
-    }
-
-    .toast {
-      position: fixed;
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: 100px;
-      background: rgba(8,15,17,0.98);
-      border: 1px solid rgba(30,240,166,0.2);
-      color: var(--text);
-      border-radius: 12px;
-      padding: 10px 14px;
-      font-size: 12px;
-      opacity: 0;
-      transition: opacity 0.25s ease, transform 0.25s ease;
-      z-index: 100;
-      pointer-events: none;
-      box-shadow: var(--shadow);
-    }
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(-6px);
-    }
-
-    .loader {
-      position: fixed;
-      inset: 0;
-      background: rgba(3,8,8,0.46);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 120;
-    }
-    .loader.show { display: flex; }
-    .spinner {
-      width: 46px; height: 46px;
-      border-radius: 50%;
-      border: 4px solid rgba(255,255,255,0.12);
-      border-top-color: var(--emerald);
-      animation: spin 0.9s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    @media (min-width: 680px) {
-      .product-grid {
-        grid-template-columns: repeat(2, minmax(0,1fr));
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>AgriLuma | Agricultural Marketplace</title>
+    <style>
+      :root {
+        --mint: #DDF5E5;
+        --green: #77C99A;
+        --green-deep: #2F7D4F;
+        --sky: #E3F2FD;
+        --cream: #FFF8E8;
+        --white: #FFFFFF;
+        --text: #1E2A27;
+        --muted: #5C6F68;
+        --line: rgba(39, 83, 63, 0.12);
+        --card: rgba(255,255,255,0.82);
+        --shadow: 0 18px 42px rgba(35, 71, 54, 0.12);
+        --shadow-soft: 0 12px 28px rgba(35, 71, 54, 0.08);
+        --success: #198754;
+        --warning: #d97706;
+        --danger: #dc2626;
+        --bg: #F5FBF7;
+        --grass: linear-gradient(135deg, #dff6e5, #c8f2d8 36%, #edf9fd 100%);
+        --green-pill: rgba(119, 201, 154, 0.14);
+        --radius-xl: 28px;
+        --radius-lg: 22px;
+        --radius-md: 16px;
+        --radius-sm: 12px;
       }
-    }
-  </style>
-</head>
-<body>
-  <div class="emerald-demo">
-    <div class="topbar">
-      <div class="brand-wrap">
-        <div class="brand-mark">E</div>
-        <div class="brand-text">
-          EmeraldTrade
-          <small>Investor Panel</small>
-        </div>
-      </div>
-      <div id="headerUser" class="header-user">
-        <div class="avatar">D</div>
-        <span>Demo User</span>
-      </div>
-    </div>
 
-    <div class="demo-banner">
-      <span class="dot"></span>
-      Demo mode only. No real money moves without verified payment confirmation and secure backend approval.
-    </div>
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(180deg, #f5fbf6 0%, #eefaf3 100%);
+        color: var(--text);
+        min-height: 100vh;
+      }
 
-    <main>
-      <section id="authPage" class="page active">
+      a { color: inherit; text-decoration: none; }
+      button, input, select, textarea {
+        font: inherit;
+      }
+
+      .app-shell {
+        max-width: 540px;
+        min-height: 100vh;
+        margin: 0 auto;
+        background: linear-gradient(180deg, #f9fdf9 0%, #f4fbf4 100%);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .app-shell::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(circle at top left, rgba(119, 201, 154, 0.18), transparent 30%),
+          radial-gradient(circle at bottom right, rgba(112, 177, 252, 0.12), transparent 22%);
+        pointer-events: none;
+      }
+
+      .page {
+        display: none;
+        padding: 16px 16px 100px;
+        position: relative;
+        z-index: 1;
+      }
+      .page.active { display: block; }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        background: rgba(255,255,255,0.8);
+        backdrop-filter: blur(18px);
+        border-bottom: 1px solid var(--line);
+        padding: 14px 16px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .brand-wrap {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .brand-mark {
+        width: 42px;
+        height: 42px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #dff6e5 0%, #77c99a 100%);
+        box-shadow: inset 0 0 18px rgba(255,255,255,0.5), 0 10px 22px rgba(119, 201, 154, 0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--green-deep);
+      }
+
+      .brand-text {
+        font-size: 1.02rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      .brand-text small {
+        display: block;
+        font-size: 10px;
+        color: var(--muted);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .notification-btn {
+        position: relative;
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        border: 1px solid var(--line);
+        background: rgba(255,255,255,0.8);
+        box-shadow: var(--shadow-soft);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+      }
+
+      .notif-count {
+        position: absolute;
+        top: -6px;
+        right: -4px;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        background: var(--danger);
+        color: white;
+        font-size: 10px;
+        font-weight: 800;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: rgba(119, 201, 154, 0.12);
+        border: 1px solid rgba(119, 201, 154, 0.18);
+        color: var(--green-deep);
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 18px 0 14px;
+      }
+      .section-head h2 {
+        margin: 0;
+        font-size: 1.15rem;
+        letter-spacing: -0.02em;
+      }
+
+      .promo-card {
+        position: relative;
+        overflow: hidden;
+        border-radius: var(--radius-xl);
+        background: linear-gradient(135deg, rgba(135, 204, 164, 0.88), rgba(255, 248, 232, 0.8)), url('https://images.unsplash.com/photo-1464226184884-fa52ac9a8a0d?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;
+        border: 1px solid rgba(255,255,255,0.5);
+        box-shadow: var(--shadow);
+        padding: 18px 18px 22px;
+        min-height: 170px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+      }
+
+      .promo-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(36,54,44,0.2));
+      }
+
+      .promo-inner {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .promo-kicker {
+        display: inline-block;
+        width: fit-content;
+        padding: 7px 10px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.24);
+        border: 1px solid rgba(255,255,255,0.3);
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        font-weight: 800;
+        color: #17392a;
+      }
+
+      .promo-copy {
+        max-width: 260px;
+      }
+      .promo-copy h1 {
+        margin: 0;
+        font-size: clamp(1.8rem, 5vw, 2.7rem);
+        line-height: 1.02;
+        letter-spacing: -0.06em;
+        color: #17392a;
+      }
+      .promo-copy p {
+        margin: 8px 0 0;
+        color: rgba(23,57,42,0.8);
+        font-size: 0.9rem;
+        line-height: 1.5;
+      }
+
+      .promo-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .primary-btn, .secondary-btn, .ghost-btn, .tiny-btn {
+        border: none;
+        cursor: pointer;
+        border-radius: 14px;
+        font-weight: 700;
+        transition: 0.2s ease;
+      }
+      .primary-btn:active, .secondary-btn:active, .ghost-btn:active, .tiny-btn:active { transform: scale(0.98); }
+
+      .primary-btn {
+        background: linear-gradient(135deg, var(--green) 0%, #9fe1b4 100%);
+        color: #18372c;
+        box-shadow: 0 16px 28px rgba(119, 201, 154, 0.25);
+        padding: 14px 18px;
+        min-width: 140px;
+      }
+      .secondary-btn {
+        background: rgba(255,255,255,0.7);
+        border: 1px solid rgba(255,255,255,0.7);
+        color: var(--text);
+        padding: 14px 16px;
+      }
+      .ghost-btn {
+        background: transparent;
+        border: 1px solid var(--line);
+        color: var(--text);
+        padding: 12px 16px;
+      }
+      .tiny-btn {
+        padding: 9px 10px;
+        background: rgba(119,201,154,0.12);
+        color: var(--green-deep);
+        border: 1px solid rgba(119,201,154,0.18);
+      }
+
+      .gift-box {
+        position: relative;
+        margin-top: 18px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(241,249,243,0.9));
+        border: 1px solid rgba(119, 201, 154, 0.18);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-soft);
+        padding: 16px;
+      }
+
+      .gift-box-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      .gift-box-head h3 {
+        margin: 0;
+        font-size: 1rem;
+      }
+
+      .gift-animated {
+        margin-top: 12px;
+        position: relative;
+        height: 90px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .gift-box-visual {
+        width: 76px;
+        height: 76px;
+        border-radius: 22px;
+        background: linear-gradient(135deg, #e9f8ef, #d8f7e6);
+        border: 1px solid rgba(119,201,154,0.24);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        transform-origin: center;
+        animation: idleFloat 2.6s ease-in-out infinite;
+        box-shadow: 0 16px 28px rgba(119, 201, 154, 0.18);
+      }
+      .gift-box-visual::before, .gift-box-visual::after {
+        content: "";
+        position: absolute;
+        background: rgba(119, 201, 154, 0.8);
+        border-radius: 12px;
+      }
+      .gift-box-visual::before {
+        width: 52px;
+        height: 8px;
+      }
+      .gift-box-visual::after {
+        width: 8px;
+        height: 52px;
+      }
+      .gift-box-visual .gift-icon {
+        position: absolute;
+        font-size: 1.8rem;
+        filter: drop-shadow(0 8px 10px rgba(119,201,154,0.25));
+      }
+      @keyframes idleFloat {
+        0%, 100% { transform: translateY(0) rotate(-2deg); }
+        50% { transform: translateY(-8px) rotate(2deg); }
+      }
+
+      .gift-box .gift-row {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .gift-box input {
+        flex: 1;
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(255,255,255,0.8);
+        outline: none;
+        padding: 12px 14px;
+        color: var(--text);
+      }
+      .gift-box input:focus {
+        border-color: rgba(119,201,154,0.4);
+        box-shadow: 0 0 0 4px rgba(119,201,154,0.08);
+      }
+
+      .wallet-wrap {
+        margin-top: 18px;
+        background: linear-gradient(135deg, rgba(119,201,154,0.18), rgba(227,242,253,0.7));
+        border: 1px solid rgba(119,201,154,0.16);
+        border-radius: var(--radius-xl);
+        padding: 16px;
+        box-shadow: var(--shadow-soft);
+      }
+      .wallet-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .wallet-label {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--muted);
+        font-weight: 700;
+      }
+      .wallet-value {
+        margin-top: 10px;
+        font-size: clamp(2rem, 7vw, 2.5rem);
+        font-weight: 800;
+        letter-spacing: -0.06em;
+      }
+      .wallet-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-top: 12px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .category-bar {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding: 6px 0 10px;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .category-bar::-webkit-scrollbar { display: none; }
+      .category-pill {
+        border: 1px solid var(--line);
+        background: rgba(255,255,255,0.8);
+        color: var(--text);
+        border-radius: 999px;
+        padding: 10px 14px;
+        white-space: nowrap;
+        font-weight: 700;
+        box-shadow: var(--shadow-soft);
+      }
+      .category-pill.active {
+        background: linear-gradient(135deg, rgba(119,201,154,0.16), rgba(227,242,253,0.6));
+        border-color: rgba(119,201,154,0.26);
+        color: var(--green-deep);
+      }
+
+      .product-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+
+      .product-card {
+        background: rgba(255,255,255,0.9);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        box-shadow: var(--shadow-soft);
+        overflow: hidden;
+      }
+      .product-image {
+        height: 180px;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+      }
+      .product-image::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(16,24,23,0.03), rgba(16,24,23,0.15));
+      }
+      .product-chip {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        z-index: 1;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.84);
+        color: var(--green-deep);
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .product-body {
+        padding: 14px 14px 16px;
+      }
+      .product-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: flex-start;
+      }
+      .product-name {
+        margin: 0;
+        font-size: 1.05rem;
+        line-height: 1.3;
+      }
+      .product-price {
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        color: var(--green-deep);
+        white-space: nowrap;
+      }
+      .product-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+      }
+      .tiny-tag {
+        display: inline-flex;
+        background: rgba(119,201,154,0.09);
+        border: 1px solid rgba(119,201,154,0.18);
+        color: var(--muted);
+        padding: 6px 8px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 700;
+      }
+      .product-desc {
+        margin: 10px 0 14px;
+        color: var(--muted);
+        line-height: 1.6;
+        font-size: 13px;
+      }
+      .product-action {
+        display: flex;
+        gap: 8px;
+      }
+      .product-action > * { flex: 1; }
+
+      .card {
+        background: rgba(255,255,255,0.82);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-soft);
+        padding: 16px;
+        margin-top: 18px;
+      }
+      .card-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+      .card-head h3 {
+        margin: 0;
+        font-size: 1rem;
+      }
+
+      .stack-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .list-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        background: rgba(244,251,246,0.8);
+        border: 1px solid rgba(119,201,154,0.10);
+        border-radius: 14px;
+        padding: 12px;
+      }
+      .list-main {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex: 1;
+        min-width: 0;
+      }
+      .list-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(119,201,154,0.1);
+        border: 1px solid rgba(119,201,154,0.18);
+        flex-shrink: 0;
+      }
+      .list-text {
+        min-width: 0;
+        flex: 1;
+      }
+      .list-text strong {
+        display: block;
+        font-size: 0.95rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .list-text small {
+        display: block;
+        color: var(--muted);
+        font-size: 11px;
+        margin-top: 4px;
+      }
+      .list-amount {
+        text-align: right;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: var(--green-deep);
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 78px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 7px 10px;
+      }
+      .status-approved { background: rgba(25,135,84,0.1); color: var(--success); }
+      .status-pending { background: rgba(217,119,6,0.1); color: var(--warning); }
+      .status-rejected { background: rgba(220,38,38,0.08); color: var(--danger); }
+      .status-processing { background: rgba(13,110,253,0.1); color: #0d6efd; }
+      .status-paid { background: rgba(119,201,154,0.12); color: var(--green-deep); }
+
+      .auth-shell {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px 16px 96px;
+      }
+      .auth-card {
+        width: 100%;
+        max-width: 420px;
+        background: rgba(255,255,255,0.9);
+        border: 1px solid var(--line);
+        border-radius: 30px;
+        box-shadow: var(--shadow);
+        padding: 18px 16px 16px;
+      }
+      .auth-top {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 4px 0 18px;
+      }
+      .auth-logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        justify-content: center;
+      }
+      .auth-logo .brand-mark {
+        width: 48px;
+        height: 48px;
+      }
+      .auth-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        margin: 0;
+      }
+      .auth-sub {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin: 6px 0 0;
+        text-align: center;
+      }
+
+      .auth-tabs {
+        display: flex;
+        gap: 8px;
+        background: rgba(119,201,154,0.09);
+        border: 1px solid rgba(119,201,154,0.12);
+        border-radius: 999px;
+        padding: 5px;
+        margin-top: 18px;
+      }
+      .auth-tab {
+        flex: 1;
+        background: transparent;
+        border: none;
+        color: var(--muted);
+        border-radius: 999px;
+        padding: 11px 12px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .auth-tab.active {
+        background: linear-gradient(135deg, #dff6e5, rgba(119,201,154,0.2));
+        color: var(--green-deep);
+        border: 1px solid rgba(119,201,154,0.2);
+      }
+
+      .auth-form {
+        display: none;
+      }
+      .auth-form.active { display: block; }
+
+      .field-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 16px;
+      }
+      .field-group label {
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 700;
+      }
+      .field-group input,
+      .field-group select,
+      .field-group textarea {
+        width: 100%;
+        border: 1px solid var(--line);
+        background: rgba(246,251,248,0.9);
+        color: var(--text);
+        border-radius: 14px;
+        padding: 13px 14px;
+        outline: none;
+      }
+      .field-group textarea { min-height: 96px; resize: vertical; }
+      .field-group input:focus,
+      .field-group select:focus,
+      .field-group textarea:focus {
+        border-color: rgba(119,201,154,0.4);
+        box-shadow: 0 0 0 4px rgba(119,201,154,0.08);
+      }
+
+      .auth-btn {
+        width: 100%;
+        margin-top: 18px;
+        padding: 15px 16px;
+      }
+
+      .split-row {
+        display: flex;
+        gap: 10px;
+        margin-top: 14px;
+      }
+      .split-row > * { flex: 1; }
+
+      .info-box {
+        margin-top: 16px;
+        background: rgba(119,201,154,0.08);
+        border: 1px solid rgba(119,201,154,0.14);
+        border-radius: 14px;
+        padding: 12px;
+        color: var(--green-deep);
+        font-size: 12px;
+        line-height: 1.7;
+      }
+
+      .bottom-nav {
+        position: fixed;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: max(12px, env(safe-area-inset-bottom));
+        width: min(540px, calc(100% - 16px));
+        background: rgba(255,255,255,0.88);
+        border: 1px solid rgba(119,201,154,0.18);
+        backdrop-filter: blur(18px);
+        border-radius: 20px;
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0,1fr));
+        gap: 6px;
+        padding: 8px;
+        box-shadow: 0 16px 34px rgba(39, 83, 63, 0.12);
+        z-index: 50;
+      }
+      .nav-btn {
+        border: none;
+        background: transparent;
+        color: var(--muted);
+        padding: 10px 6px 8px;
+        border-radius: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-size: 10px;
+        font-weight: 800;
+        cursor: pointer;
+        min-height: 60px;
+      }
+      .nav-btn.active {
+        background: linear-gradient(135deg, rgba(119,201,154,0.18), rgba(227,242,253,0.5));
+        color: var(--green-deep);
+        border: 1px solid rgba(119,201,154,0.2);
+      }
+      .nav-emoji { font-size: 18px; }
+
+      .modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(20,29,25,0.34);
+        display: none;
+        align-items: flex-end;
+        justify-content: center;
+        z-index: 90;
+        padding: 18px 12px;
+      }
+      .modal.show { display: flex; }
+      .modal-card {
+        width: min(540px, 100%);
+        background: rgba(255,255,255,0.96);
+        border: 1px solid var(--line);
+        border-radius: 24px 24px 18px 18px;
+        padding: 18px 16px 16px;
+        box-shadow: var(--shadow);
+        animation: slideUp 0.25s ease;
+      }
+      @keyframes slideUp {
+        from { opacity: 0; transform: translateY(14px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+      .modal-title {
+        margin: 0;
+        font-size: 1.1rem;
+      }
+      .close-modal {
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: rgba(119,201,154,0.08);
+        border-radius: 50%;
+        color: var(--text);
+        cursor: pointer;
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(22,28,25,0.94);
+        color: white;
+        border-radius: 12px;
+        padding: 10px 14px;
+        opacity: 0;
+        transition: 0.25s ease;
+        pointer-events: none;
+        z-index: 120;
+        box-shadow: var(--shadow);
+      }
+      .toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(-6px);
+      }
+
+      .loader {
+        position: fixed;
+        inset: 0;
+        background: rgba(22,28,25,0.2);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 130;
+      }
+      .loader.show { display: flex; }
+      .spinner {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        border: 4px solid rgba(255,255,255,0.15);
+        border-top-color: var(--green);
+        animation: spin 0.9s linear infinite;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+      .summary-card {
+        background: rgba(255,255,255,0.9);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 14px 12px;
+        box-shadow: var(--shadow-soft);
+      }
+      .summary-card .label {
+        display: block;
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+      .summary-card .num {
+        font-size: clamp(1.3rem, 5vw, 1.9rem);
+        font-weight: 800;
+        letter-spacing: -0.05em;
+      }
+
+      .analytics-row {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0,1fr));
+        gap: 10px;
+        margin-top: 16px;
+      }
+      .analytics-box {
+        background: rgba(127, 211, 168, 0.1);
+        border: 1px solid rgba(119,201,154,0.18);
+        border-radius: 14px;
+        padding: 12px 10px;
+        text-align: center;
+      }
+      .analytics-box .small-label {
+        display: block;
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+      .analytics-box strong {
+        font-size: 1.1rem;
+        letter-spacing: -0.04em;
+      }
+
+      .empty-state {
+        text-align: center;
+        color: var(--muted);
+        background: rgba(244,251,246,0.7);
+        border: 1px dashed rgba(119,201,154,0.26);
+        border-radius: 16px;
+        padding: 18px 12px;
+        margin-top: 12px;
+      }
+
+      @media (min-width: 680px) {
+        .product-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <div id="authPage" class="page active">
         <div class="auth-shell">
           <div class="auth-card">
-            <div class="auth-header">
-              <div class="brand-wrap">
-                <div class="brand-mark">E</div>
-                <div class="brand-text">
-                  EmeraldTrade
-                  <small>Secure Demo</small>
+            <div class="auth-top">
+              <div class="auth-logo">
+                <div class="brand-mark">A</div>
+                <div>
+                  <div class="brand-text">AgriLuma</div>
+                  <div class="auth-sub">Agricultural marketplace</div>
                 </div>
               </div>
             </div>
 
             <div class="auth-tabs">
-              <button class="auth-tab active" data-auth="login">Login</button>
-              <button class="auth-tab" data-auth="register">Register</button>
+              <button class="auth-tab active" data-view="login">Login</button>
+              <button class="auth-tab" data-view="register">Register</button>
             </div>
 
             <form id="loginForm" class="auth-form active">
               <div class="field-group">
-                <label for="loginEmail">Email or Username</label>
-                <input id="loginEmail" name="email" type="text" placeholder="demo@emeraldtrade.demo" required />
+                <label for="loginPhone">Mobile number</label>
+                <input id="loginPhone" type="tel" placeholder="017XXXXXXXX" required />
               </div>
               <div class="field-group">
                 <label for="loginPassword">Password</label>
-                <input id="loginPassword" name="password" type="password" placeholder="********" required />
+                <input id="loginPassword" type="password" placeholder="Enter your password" required />
               </div>
-              <button type="submit" class="primary-btn">Login to Demo Account</button>
+              <button type="submit" class="primary-btn auth-btn">Login securely</button>
               <div class="split-row">
-                <button type="button" class="secondary-btn" id="useDemoAccountBtn">Use Demo Account</button>
-                <button type="button" class="ghost-btn" id="demoModeBtn">Demo Mode</button>
+                <button type="button" class="ghost-btn" id="demoLoginBtn">Demo login</button>
+                <button type="button" class="secondary-btn" id="otpAssistBtn">Use OTP</button>
               </div>
-              <div class="demo-user-box">
-                Demo account: <strong>demo@emeraldtrade.demo</strong><br />
-                Password: <strong>demo1234</strong>
-              </div>
-              <div class="tiny-note">
-                This is a frontend demo interface only. It does not represent secure authentication, protected session management, or real financial access.
+              <div class="info-box">
+                <strong>Security:</strong> server-side verification and wallet ledger are required for production approval. This interface is optimized for Android-first access and mobile payments.
               </div>
             </form>
 
             <form id="registerForm" class="auth-form">
               <div class="field-group">
-                <label for="regName">Full Name</label>
-                <input id="regName" name="name" type="text" placeholder="John Carter" required />
+                <label for="regName">Full name</label>
+                <input id="regName" type="text" placeholder="Nazrul Islam" required />
               </div>
               <div class="field-group">
-                <label for="regEmail">Email Address</label>
-                <input id="regEmail" name="email" type="email" placeholder="you@example.com" required />
+                <label for="regPhone">Bangladesh mobile number</label>
+                <input id="regPhone" type="tel" placeholder="017XXXXXXXX" required />
               </div>
               <div class="field-group">
-                <label for="regUsername">Username</label>
-                <input id="regUsername" name="username" type="text" placeholder="investor_01" required />
+                <label for="regRef">Referral code (optional)</label>
+                <input id="regRef" type="text" placeholder="AGRI50 or invite link" />
               </div>
-              <div class="field-group">
-                <label for="regPassword">Password</label>
-                <input id="regPassword" name="password" type="password" placeholder="Min 6 chars" minlength="6" required />
-              </div>
-              <div class="field-group">
-                <label for="regRef">Referral Code (Optional)</label>
-                <input id="regRef" name="ref" type="text" placeholder="EMERD10" />
-              </div>
-              <button type="submit" class="primary-btn">Create Demo Account</button>
-              <div class="tiny-note">
-                This is a demo registration UI. Real user registration must use backend validation, strong password hashing, email verification, and secure token issuance.
+              <button type="submit" class="primary-btn auth-btn">Send OTP</button>
+              <div class="info-box">
+                Unique user ID and referral code are generated after successful verification. Self-referrals, duplicate accounts, and circular referrals are blocked on the backend.
               </div>
             </form>
           </div>
         </div>
-      </section>
+      </div>
 
-      <section id="dashboardPage" class="page">
-        <div class="section-title">
-          <span>Dashboard</span>
-          <span class="badge">Live Demo</span>
+      <div id="otpPage" class="page">
+        <div class="auth-shell">
+          <div class="auth-card">
+            <div class="auth-top">
+              <div class="auth-logo">
+                <div class="brand-mark">A</div>
+                <div>
+                  <div class="brand-text">Verify your phone</div>
+                  <div class="auth-sub">One-time password</div>
+                </div>
+              </div>
+            </div>
+
+            <form id="otpForm">
+              <div class="field-group">
+                <label for="otpCode">Enter 6-digit OTP</label>
+                <input id="otpCode" type="text" maxlength="6" placeholder="123456" required />
+              </div>
+              <button type="submit" class="primary-btn auth-btn">Confirm OTP</button>
+              <div class="split-row">
+                <button type="button" class="ghost-btn" id="resendOtpBtn">Resend</button>
+                <button type="button" class="secondary-btn" id="backToLoginBtn">Back</button>
+              </div>
+              <div class="info-box">
+                OTP is only for local account verification in this client. Production uses authenticated server-side verification and rate limiting.
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div id="mainPage" class="page">
+        <div class="topbar">
+          <div class="brand-wrap">
+            <div class="brand-mark">A</div>
+            <div class="brand-text">
+              AgriLuma
+              <small>Marketplace</small>
+            </div>
+          </div>
+          <div class="header-actions">
+            <button class="notification-btn" id="notificationBtn" aria-label="Notifications">
+              🔔
+              <span class="notif-count" id="notifBadge">3</span>
+            </button>
+          </div>
         </div>
 
-        <div class="stats-grid" id="dashboardStats"></div>
+        <div class="page-content">
+          <div class="promo-card">
+            <div class="promo-inner">
+              <span class="promo-kicker">Fresh harvest</span>
+              <div class="promo-copy">
+                <h1>Farm fresh daily.</h1>
+                <p>Premium poultry, livestock, and agricultural essentials delivered with trusted payment support.</p>
+              </div>
+              <div class="promo-actions">
+                <button class="primary-btn" data-target="productsPage">Download App</button>
+                <button class="secondary-btn" data-target="referralPage">Invite friends</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gift-box">
+            <div class="gift-box-head">
+              <h3>Gift code</h3>
+              <span class="badge" id="giftBadge">Reward up to ৳20</span>
+            </div>
+            <div class="gift-animated">
+              <div class="gift-box-visual" id="giftVisual">
+                <span class="gift-icon">🎁</span>
+              </div>
+            </div>
+            <div class="gift-row">
+              <input id="giftCodeInput" type="text" placeholder="AGRI-2026" />
+              <button class="tiny-btn" id="redeemGiftBtn">Redeem</button>
+            </div>
+          </div>
+
+          <div class="wallet-wrap">
+            <div class="wallet-top">
+              <div class="wallet-label">Wallet balance</div>
+              <button class="tiny-btn" data-target="depositPage">Deposit</button>
+            </div>
+            <div class="wallet-value">৳ 12,480</div>
+            <div class="wallet-meta">
+              <span>Available balance</span>
+              <span>Verified</span>
+            </div>
+          </div>
+
+          <div class="section-head">
+            <h2>Categories</h2>
+            <span class="badge">Featured</span>
+          </div>
+
+          <div class="category-bar">
+            <button class="category-pill active">Chicken</button>
+            <button class="category-pill">Goat</button>
+            <button class="category-pill">Cow</button>
+            <button class="category-pill">Others</button>
+          </div>
+
+          <div class="section-head">
+            <h2>Featured products</h2>
+            <button class="tiny-btn" data-target="productsPage">View all</button>
+          </div>
+
+          <div id="featuredProductGrid" class="product-grid"></div>
+
+          <div class="section-head">
+            <h2>Quick access</h2>
+          </div>
+          <div class="summary-grid">
+            <div class="summary-card" data-target="depositPage">
+              <span class="label">Deposit</span>
+              <div class="num">৳ 4,200</div>
+            </div>
+            <div class="summary-card" data-target="withdrawPage">
+              <span class="label">Withdraw</span>
+              <div class="num">৳ 1,050</div>
+            </div>
+            <div class="summary-card" data-target="productsPage">
+              <span class="label">Orders</span>
+              <div class="num">12</div>
+            </div>
+            <div class="summary-card" data-target="referralPage">
+              <span class="label">Referrals</span>
+              <div class="num">18</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h3>Recent activity</h3>
+              <span class="badge" id="activityCount">4</span>
+            </div>
+            <div id="recentActivityList" class="stack-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="productsPage" class="page">
+        <div class="section-head">
+          <h2>Products</h2>
+          <span class="badge">All categories</span>
+        </div>
+        <div class="category-bar">
+          <button class="category-pill active" data-category="Chicken">Chicken</button>
+          <button class="category-pill" data-category="Goat">Goat</button>
+          <button class="category-pill" data-category="Cow">Cow</button>
+          <button class="category-pill" data-category="Other">Other</button>
+        </div>
+        <div id="productsList" class="product-grid"></div>
+      </div>
+
+      <div id="depositPage" class="page">
+        <div class="section-head">
+          <h2>Deposit</h2>
+          <span class="badge">bKash / Nagad</span>
+        </div>
 
         <div class="card">
-          <div class="section-title">
-            <span>Quick Actions</span>
+          <div class="card-head">
+            <h3>Payment instructions</h3>
           </div>
-          <div class="quick-actions">
-            <button class="quick-btn" data-page="depositPage">
-              <span class="emoji">💳</span>
-              Deposit
-            </button>
-            <button class="quick-btn" data-page="withdrawPage">
-              <span class="emoji">🏦</span>
-              Withdraw
-            </button>
-            <button class="quick-btn" data-page="marketPage">
-              <span class="emoji">🛍️</span>
-              Shop
-            </button>
-            <button class="quick-btn" data-page="referralPage">
-              <span class="emoji">👥</span>
-              Referral
-            </button>
-            <button class="quick-btn" data-page="transactionsPage">
-              <span class="emoji">📊</span>
-              History
-            </button>
-            <button class="quick-btn" data-page="profilePage">
-              <span class="emoji">👤</span>
-              Profile
-            </button>
+          <div class="info-box" style="margin-top:0;">
+            <strong>Send to:</strong> 01865255493<br />
+            <strong>Method:</strong> bKash or Nagad<br />
+            <strong>After payment:</strong> submit the amount and TrxID for review. Funds are credited only after verification.
           </div>
-        </div>
-
-        <div class="card">
-          <div class="section-title">
-            <span>Recent Transactions</span>
-            <span class="badge" id="transactionBadge">0</span>
+          <div class="split-row" style="margin-top:12px;">
+            <button class="ghost-btn" id="copyNumberBtn">Copy number</button>
+            <button class="secondary-btn" id="sendMoneyBtn">Send money</button>
           </div>
-          <div id="recentTxList" class="tx-list"></div>
-        </div>
-
-        <div class="card">
-          <div class="section-title">
-            <span>Notifications</span>
-            <span class="badge" id="notificationBadge">0</span>
-          </div>
-          <div id="dashboardNotifications" class="notif-list"></div>
-        </div>
-      </section>
-
-      <section id="marketPage" class="page">
-        <div class="section-title">
-          <span>Product Marketplace</span>
-          <span class="badge">Premium Picks</span>
-        </div>
-        <div id="productGrid" class="product-grid"></div>
-      </section>
-
-      <section id="depositPage" class="page">
-        <div class="section-title">
-          <span>Deposit</span>
-          <span class="badge">Demo Notice</span>
-        </div>
-
-        <div class="panel">
-          <div class="tiny-note" style="margin-top:0; margin-bottom:10px;">
-            Demo mode only. Deposit requests do not receive real funds until a secure backend validates payment and confirms transaction status.
-          </div>
-
-          <form id="depositForm">
+          <form id="depositForm" style="margin-top: 16px;">
             <div class="field-group">
-              <label for="depositAmount">Deposit Amount</label>
-              <input id="depositAmount" type="number" min="10" step="10" placeholder="500" required />
+              <label for="depositAmount">Amount</label>
+              <input id="depositAmount" type="number" min="100" step="10" placeholder="500" required />
             </div>
             <div class="field-group">
-              <label for="depositMethod">Payment Method</label>
-              <select id="depositMethod" required>
-                <option value="">Select payment method</option>
-                <option value="Bank Transfer">Bank Transfer</option>
-                <option value="USDT">USDT</option>
-                <option value="Bank Card">Bank Card</option>
-                <option value="Crypto">Crypto</option>
+              <label for="depositMethod">Payment method</label>
+              <select id="depositMethod">
+                <option value="bKash">bKash</option>
+                <option value="Nagad">Nagad</option>
               </select>
             </div>
             <div class="field-group">
-              <label for="depositReference">Transaction Reference</label>
-              <input id="depositReference" type="text" placeholder="Example: TRX-3201 / Proof of payment" required />
+              <label for="depositTrx">Transaction ID (TrxID)</label>
+              <input id="depositTrx" type="text" placeholder="TCK12345" required />
             </div>
-            <button type="submit" class="primary-btn">Submit Deposit Request</button>
+            <button type="submit" class="primary-btn auth-btn">Submit Deposit</button>
           </form>
         </div>
 
         <div class="card">
-          <div class="section-title">
-            <span>Deposit History</span>
+          <div class="card-head">
+            <h3>Deposit history</h3>
+            <span class="badge">Status</span>
           </div>
-          <div id="depositHistory" class="tx-list"></div>
+          <div id="depositHistoryList" class="stack-list"></div>
         </div>
-      </section>
+      </div>
 
-      <section id="withdrawPage" class="page">
-        <div class="section-title">
-          <span>Withdraw</span>
-          <span class="badge">Demo Mode</span>
+      <div id="withdrawPage" class="page">
+        <div class="section-head">
+          <h2>Withdraw</h2>
+          <span class="badge">Secure review</span>
         </div>
 
-        <div class="panel">
-          <div class="tiny-note" style="margin-top:0; margin-bottom:10px;">
-            Withdrawal requests in demo mode do not transfer real funds. Minimum withdrawal amount is set to 100 USD. Backend review is required before any actual transfer.
-          </div>
-
+        <div class="card">
           <form id="withdrawForm">
             <div class="field-group">
-              <label for="withdrawAmount">Withdrawal Amount</label>
-              <input id="withdrawAmount" type="number" min="100" step="10" placeholder="500" required />
+              <label for="withdrawRecipient">Recipient number</label>
+              <input id="withdrawRecipient" type="tel" placeholder="017XXXXXXXX" required />
             </div>
             <div class="field-group">
-              <label for="withdrawMethod">Payment Method</label>
-              <select id="withdrawMethod" required>
-                <option value="">Select payment method</option>
-                <option value="Bank Account">Bank Account</option>
-                <option value="USDT Wallet">USDT Wallet</option>
-                <option value="E-Wallet">E-Wallet</option>
-                <option value="Crypto">Crypto Wallet</option>
+              <label for="withdrawAmount">Amount</label>
+              <input id="withdrawAmount" type="number" min="100" step="10" placeholder="2000" required />
+            </div>
+            <div class="field-group">
+              <label for="withdrawMethod">Payment method</label>
+              <select id="withdrawMethod">
+                <option value="bKash">bKash</option>
+                <option value="Nagad">Nagad</option>
               </select>
             </div>
-            <div class="field-group">
-              <label for="withdrawDestination">Destination Details</label>
-              <textarea id="withdrawDestination" placeholder="Bank account number, wallet address, or recipient details" required></textarea>
-            </div>
-            <button type="submit" class="primary-btn">Submit Withdrawal Request</button>
+            <button type="submit" class="primary-btn auth-btn">Submit Withdrawal</button>
           </form>
-          <div class="tiny-note" style="margin-top:12px;">
-            Minimum withdrawal: <strong>100 USD</strong>. Review times may vary. All withdrawals are pending review and require secure backend verification.
-          </div>
         </div>
 
         <div class="card">
-          <div class="section-title">
-            <span>Withdrawal History</span>
+          <div class="card-head">
+            <h3>Withdrawal history</h3>
           </div>
-          <div id="withdrawHistory" class="tx-list"></div>
+          <div id="withdrawHistoryList" class="stack-list"></div>
         </div>
-      </section>
-
-      <section id="referralPage" class="page">
-        <div class="section-title">
-          <span>Referral System</span>
-          <span class="badge">Demo</span>
-        </div>
-
-        <div class="panel">
-          <div class="field-group">
-            <label>Your Referral Code</label>
-            <input id="refCodeDisplay" type="text" readonly />
-          </div>
-          <div class="field-group">
-            <label>Your Referral Link</label>
-            <input id="refLinkDisplay" type="text" readonly />
-          </div>
-          <div class="split-row">
-            <button class="secondary-btn" id="copyReferralBtn" type="button">Copy Referral Link</button>
-            <button class="ghost-btn" id="shareReferralBtn" type="button">Share</button>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="section-title">
-            <span>Referral Statistics</span>
-          </div>
-          <div id="refStats" class="stats-strip"></div>
-        </div>
-
-        <div class="card">
-          <div class="section-title">
-            <span>Invited Members</span>
-          </div>
-          <div id="invitedMembersList" class="mini-list"></div>
-        </div>
-
-        <div class="card">
-          <div class="section-title">
-            <span>Reward History</span>
-          </div>
-          <div id="rewardHistory" class="tx-list"></div>
-        </div>
-      </section>
-
-      <section id="productsPage" class="page">
-        <div class="section-title">
-          <span>My Products & Orders</span>
-          <span class="badge" id="myProductsCount">0</span>
-        </div>
-        <div id="ordersList" class="table-list"></div>
-      </section>
-
-      <section id="transactionsPage" class="page">
-        <div class="section-title">
-          <span>Transaction History</span>
-          <span class="badge">All Activity</span>
-        </div>
-
-        <div class="panel">
-          <div class="field-group">
-            <label for="transactionSearch">Search</label>
-            <input id="transactionSearch" type="text" placeholder="Search by ID, type, or description" />
-          </div>
-          <div class="field-group">
-            <label for="transactionFilter">Filter by Type</label>
-            <select id="transactionFilter">
-              <option value="all">All</option>
-              <option value="deposit">Deposit</option>
-              <option value="withdrawal">Withdrawal</option>
-              <option value="purchase">Purchase</option>
-              <option value="referral_reward">Referral Reward</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="card">
-          <table class="list-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Type</th>
-                <th>Amt</th>
-                <th>Status</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody id="transactionsTableBody"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <section id="profilePage" class="page">
-        <div class="section-title">
-          <span>Profile</span>
-          <span class="badge">User ID</span>
-        </div>
-
-        <div class="panel" id="profilePanel"></div>
-
-        <div class="card">
-          <div class="section-title">
-            <span>Account Controls</span>
-          </div>
-          <div class="split-row">
-            <button class="secondary-btn" id="resetDemoDataBtn" type="button">Reset Demo Data</button>
-            <button class="ghost-btn" id="logoutBtn" type="button">Logout</button>
-          </div>
-        </div>
-      </section>
-
-      <section id="notificationsPage" class="page">
-        <div class="section-title">
-          <span>Notifications</span>
-          <span class="badge" id="notiCount">0</span>
-        </div>
-        <div id="fullNotificationsList" class="notif-list"></div>
-      </section>
-
-      <section id="helpPage" class="page">
-        <div class="section-title">
-          <span>Help & Support</span>
-          <span class="badge">Support</span>
-        </div>
-        <div class="helper-list">
-          <div class="helper-item">
-            <h4>1. How do I buy products?</h4>
-            <p>Go to Product Marketplace, choose a product, click Buy Now, and confirm the order in the popup. In demo mode, a sample order is created instantly.</p>
-          </div>
-          <div class="helper-item">
-            <h4>2. How do deposits work?</h4>
-            <p>Use the deposit form to submit a request with method and reference. The demo is only for UX testing. Secure validation happens in a real backend.</p>
-          </div>
-          <div class="helper-item">
-            <h4>3. Is this secure?</h4>
-            <p>No. This is a frontend demo only. Authentication, payment processing, and sensitive data must be handled by a secure backend and database.</p>
-          </div>
-        </div>
-      </section>
-
-      <section id="faqPage" class="page">
-        <div class="section-title">
-          <span>FAQ</span>
-          <span class="badge">Common Queries</span>
-        </div>
-        <div class="helper-list">
-          <div class="helper-item">
-            <h4>Is it a real financial app?</h4>
-            <p>No. This is a UI/UX demo for Android-friendly fintech design. Real transactions require secure backend verification.</p>
-          </div>
-          <div class="helper-item">
-            <h4>Do withdrawals transfer money?</h4>
-            <p>No. Demo withdrawals are simulation only and do not transfer real funds.</p>
-          </div>
-          <div class="helper-item">
-            <h4>Can I reset all demo data?</h4>
-            <p>Yes, use the Reset Demo Data button in the Profile page.</p>
-          </div>
-        </div>
-      </section>
-
-      <section id="termsPage" class="page">
-        <div class="section-title">
-          <span>Terms & Conditions</span>
-          <span class="badge">Demo</span>
-        </div>
-        <div class="helper-list">
-          <div class="helper-item">
-            <h4>General</h4>
-            <p>This UI is a demonstration interface for educational and prototype purposes only. It does not constitute legal, financial, or broker-managed service.</p>
-          </div>
-          <div class="helper-item">
-            <h4>Use Restrictions</h4>
-            <p>Users must not treat demo data as live financial data. All actions are simulation-only until secured backend integration is completed.</p>
-          </div>
-        </div>
-      </section>
-
-      <section id="privacyPage" class="page">
-        <div class="section-title">
-          <span>Privacy Policy</span>
-          <span class="badge">Demo</span>
-        </div>
-        <div class="helper-list">
-          <div class="helper-item">
-            <h4>Data Handling</h4>
-            <p>Only non-sensitive demo data is stored locally in browser storage. No real payment credentials or personal financial details are used in this frontend demo.</p>
-          </div>
-          <div class="helper-item">
-            <h4>Production</h4>
-            <p>In a production environment, personal data should be encrypted, access-controlled, and stored in a secure database behind authenticated APIs.</p>
-          </div>
-        </div>
-      </section>
-
-      <section id="riskPage" class="page">
-        <div class="section-title">
-          <span>Risk Disclosure</span>
-          <span class="badge">Important</span>
-        </div>
-        <div class="helper-list">
-          <div class="helper-item">
-            <h4>Investment Risk</h4>
-            <p>All investment and product participation involve risk. This demo does not provide financial advice or any guarantee of returns. Actual investment decisions must be based on verified market data and compliant legal review.</p>
-          </div>
-          <div class="helper-item">
-            <h4>Demo Status</h4>
-            <p>Nothing in this page shall be interpreted as operating financial transactions or legal commitments. It is a non-production frontend prototype.</p>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <nav class="bottom-nav" id="bottomNav" aria-label="Main navigation">
-      <button class="nav-btn active" data-page="dashboardPage"><span class="nav-emoji">🏠</span>Home</button>
-      <button class="nav-btn" data-page="marketPage"><span class="nav-emoji">🛒</span>Shop</button>
-      <button class="nav-btn" data-page="depositPage"><span class="nav-emoji">💸</span>Deposit</button>
-      <button class="nav-btn" data-page="withdrawPage"><span class="nav-emoji">🏦</span>Withdraw</button>
-      <button class="nav-btn" data-page="profilePage"><span class="nav-emoji">👤</span>Profile</button>
-    </nav>
-  </div>
-
-  <div class="modal" id="buyModal" aria-modal="true" role="dialog">
-    <div class="modal-card">
-      <div class="modal-header">
-        <div class="brand-text" style="font-size:14px;">
-          Confirm Purchase
-          <small style="display:block; font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted);">Demo order</small>
-        </div>
-        <button class="close-modal" type="button" id="closeBuyModal">×</button>
       </div>
-      <div id="buyModalBody"></div>
-      <div class="split-row" style="margin-top:16px;">
-        <button type="button" class="ghost-btn" id="cancelBuy">Cancel</button>
-        <button type="button" class="primary-btn" id="confirmBuy">Confirm Order</button>
+
+      <div id="referralPage" class="page">
+        <div class="section-head">
+          <h2>Referral dashboard</h2>
+          <span class="badge">3-level system</span>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h3>My referral link</h3>
+            <button class="tiny-btn" id="copyReferralBtn">Copy link</button>
+          </div>
+          <div class="info-box" style="margin-top:0;">
+            https://agriluma.app/invite/AGRI-2026
+          </div>
+        </div>
+
+        <div class="summary-grid">
+          <div class="summary-card">
+            <span class="label">Direct</span>
+            <div class="num">12</div>
+          </div>
+          <div class="summary-card">
+            <span class="label">Level 1</span>
+            <div class="num">43</div>
+          </div>
+          <div class="summary-card">
+            <span class="label">Level 2</span>
+            <div class="num">26</div>
+          </div>
+          <div class="summary-card">
+            <span class="label">Level 3</span>
+            <div class="num">8</div>
+          </div>
+        </div>
+
+        <div class="analytics-row">
+          <div class="analytics-box">
+            <span class="small-label">Eligible</span>
+            <strong>৳ 4,820</strong>
+          </div>
+          <div class="analytics-box">
+            <span class="small-label">Pending</span>
+            <strong>৳ 1,150</strong>
+          </div>
+          <div class="analytics-box">
+            <span class="small-label">Paid</span>
+            <strong>৳ 860</strong>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h3>Commission breakdown</h3>
+          </div>
+          <div class="stack-list">
+            <div class="list-item">
+              <div class="list-main">
+                <div class="list-icon">👥</div>
+                <div class="list-text"><strong>Direct referral reward</strong><small>Configurable: ৳70 after qualifying conditions</small></div>
+              </div>
+              <div class="list-amount">৳70</div>
+            </div>
+            <div class="list-item">
+              <div class="list-main">
+                <div class="list-icon">📈</div>
+                <div class="list-text"><strong>Level 1</strong><small>10% of eligible qualifying activity</small></div>
+              </div>
+              <div class="list-amount">10%</div>
+            </div>
+            <div class="list-item">
+              <div class="list-main">
+                <div class="list-icon">🌿</div>
+                <div class="list-text"><strong>Level 2</strong><small>6% of eligible qualifying activity</small></div>
+              </div>
+              <div class="list-amount">6%</div>
+            </div>
+            <div class="list-item">
+              <div class="list-main">
+                <div class="list-icon">🌾</div>
+                <div class="list-text"><strong>Level 3</strong><small>3% of eligible qualifying activity</small></div>
+              </div>
+              <div class="list-amount">3%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="communityPage" class="page">
+        <div class="section-head">
+          <h2>Community</h2>
+          <span class="badge">Live updates</span>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h3>Telegram channels</h3>
+          </div>
+          <div class="stack-list">
+            <div class="list-item">
+              <div class="list-main">
+                <div class="list-icon">📣</div>
+                <div class="list-text"><strong>Announcements</strong><small>@agriluma_updates</small></div>
+              </div>
+              <button class="tiny-btn" data-url="https://t.me/agriluma_updates">Join</button>
+            </div>
+            <div class="list-item">
+              <div class="list-main">
+                <div class="list-icon">👨‍🌾</div>
+                <div class="list-text"><strong>Community group</strong><small>@agriluma_group</small></div>
+              </div>
+              <button class="tiny-btn" data-url="https://t.me/agriluma_group">Join</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h3>Announcements</h3>
+          </div>
+          <div class="stack-list">
+            <div class="list-item">
+              <div class="list-main">
+                <div class="list-icon">📢</div>
+                <div class="list-text"><strong>Weekend poultry pricing update</strong><small>Fresh stock is available from 8 AM</small></div>
+              </div>
+            </div>
+            <div class="list-item">
+              <div class="list-main">
+                <div class="list-icon">🚚</div>
+                <div class="list-text"><strong>Delivery expansion in Dhaka</strong><small>New coverage added across Mirpur and Uttara</small></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="notificationsPage" class="page">
+        <div class="section-head">
+          <h2>Notifications</h2>
+          <span class="badge" id="notificationBadgeTop">3</span>
+        </div>
+        <div id="fullNotificationsList" class="card stack-list"></div>
+      </div>
+
+      <nav class="bottom-nav">
+        <button class="nav-btn active" data-target="mainPage"><span class="nav-emoji">🏠</span>Home</button>
+        <button class="nav-btn" data-target="productsPage"><span class="nav-emoji">🛍️</span>Products</button>
+        <button class="nav-btn" data-target="depositPage"><span class="nav-emoji">💳</span>Deposit</button>
+        <button class="nav-btn" data-target="referralPage"><span class="nav-emoji">👥</span>Referral</button>
+        <button class="nav-btn" data-target="communityPage"><span class="nav-emoji">💬</span>Community</button>
+      </nav>
+    </div>
+
+    <div class="modal" id="successModal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 class="modal-title">Success</h3>
+          <button class="close-modal" aria-label="Close">×</button>
+        </div>
+        <div id="successContent" class="info-box" style="margin-top:0;">
+          Request submitted successfully.
+        </div>
       </div>
     </div>
-  </div>
 
-  <div id="toast" class="toast" aria-live="polite"></div>
-  <div id="loader" class="loader"><div class="spinner"></div></div>
+    <div class="toast" id="toast"></div>
+    <div class="loader" id="loader"><div class="spinner"></div></div>
 
-  <script>
-    const STORAGE_KEY = "emerald_trade_demo_v1";
-    const pages = [...document.querySelectorAll(".page")];
-    const navButtons = [...document.querySelectorAll(".nav-btn")];
-    const authTabs = [...document.querySelectorAll(".auth-tab")];
-    const appState = {
-      currentUser: null,
-      users: [],
-      products: [],
-      orders: [],
-      transactions: [],
-      deposits: [],
-      withdrawals: [],
-      notifications: [],
-      referrals: []
-    };
-
-    const productSeed = [
-      {
-        id: "P-1001",
-        name: "Emerald Growth Plan",
-        price: 299,
-        description: "A premium digital investment package for early-stage portfolio expansion and compounding growth.",
-        details: ["High demand", "Priority access", "Market analytics"],
-        image: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=900&q=80"
-      },
-      {
-        id: "P-1002",
-        name: "Stable Yield Bundle",
-        price: 499,
-        description: "Lower volatility investment bundle designed for steady returns and strategic reinvestment.",
-        details: ["Low risk", "Monthly insights", "Priority support"],
-        image: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=900&q=80"
-      },
-      {
-        id: "P-1003",
-        name: "AI Signal Pack",
-        price: 899,
-        description: "Advanced AI-driven market signal package with setup guidance and performance summaries.",
-        details: ["AI signals", "Weekly brief", "VIP access"],
-        image: "https://images.unsplash.com/photo-1516321165247-4aa89a48be28?auto=format&fit=crop&w=900&q=80"
-      },
-      {
-        id: "P-1004",
-        name: "Wealth Builder Kit",
-        price: 699,
-        description: "A structured product bundle for long-term growth planning and diversified asset tracking.",
-        details: ["Diversified", "Pro tools", "Member access"],
-        image: "https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=900&q=80"
-      }
-    ];
-
-    function createInitialState() {
-      const demoUser = {
-        id: "U-20011",
-        name: "Demo Investor",
-        email: "demo@emeraldtrade.demo",
-        username: "demo_investor",
-        password: "demo1234",
-        referralCode: "EMERD10",
-        balance: 18430,
-        createdAt: new Date().toISOString()
+    <script>
+      const state = {
+        activePage: 'mainPage',
+        products: [
+          { name: 'Broiler Chicken Pack', category: 'Chicken', price: 500, image: 'https://images.unsplash.com/photo-1607623814075-e51df1d652e0?auto=format&fit=crop&w=900&q=80', stock: 18, desc: 'Tender broiler chicken for family meals and village business orders.' },
+          { name: 'Village Chicken', category: 'Chicken', price: 800, image: 'https://images.unsplash.com/photo-1502741338009-cac2772e18bc?auto=format&fit=crop&w=900&q=80', stock: 12, desc: 'Healthy country chicken prepared for households and festive demand.' },
+          { name: 'Premium Chicken', category: 'Chicken', price: 1500, image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80', stock: 10, desc: 'High-quality premium breed selection with consistent weight and freshness.' },
+          { name: 'Goat Kid', category: 'Goat', price: 2000, image: 'https://images.unsplash.com/photo-1551970634-747846a548cb?auto=format&fit=crop&w=900&q=80', stock: 6, desc: 'Well-conditioned goat for livestock cultivation and commercial supply.' },
+          { name: 'Young Goat', category: 'Goat', price: 2500, image: 'https://images.unsplash.com/photo-1574144112991-e55b466d2f89?auto=format&fit=crop&w=900&q=80', stock: 8, desc: 'Strong, healthy animals suitable for farm and commercial breeding.' },
+          { name: 'Cow Starter', category: 'Cow', price: 12000, image: 'https://images.unsplash.com/photo-1527153857715-3908f2bae5e8?auto=format&fit=crop&w=900&q=80', stock: 4, desc: 'Well-maintained cattle for dairy or livestock operations.' },
+          { name: 'Organic Feed Bag', category: 'Other', price: 450, image: 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=900&q=80', stock: 28, desc: 'Balanced nutrition support for poultry and livestock wellness.' },
+          { name: 'Agri Tools Kit', category: 'Other', price: 1200, image: 'https://images.unsplash.com/photo-1464226184884-fa52ac9a8a0d?auto=format&fit=crop&w=900&q=80', stock: 11, desc: 'Essential farm tools and equipment for modern agricultural routines.' }
+        ],
+        deposits: [
+          { method: 'bKash', amount: 1500, id: 'TX-2048', status: 'Approved' },
+          { method: 'Nagad', amount: 2000, id: 'TX-2049', status: 'Pending' },
+          { method: 'bKash', amount: 500, id: 'TX-2050', status: 'Under Review' }
+        ],
+        withdrawals: [
+          { method: 'bKash', amount: 800, recipient: '017XXXXXXXX', status: 'Pending' },
+          { method: 'Nagad', amount: 1200, recipient: '018XXXXXXXX', status: 'Approved' }
+        ],
+        notifications: [
+          { title: 'Deposit approved', text: 'Your bKash deposit of ৳1,500 was verified and credited.', time: '2m ago' },
+          { title: 'Referral earning', text: 'Level 1 commission of ৳180 is pending approval.', time: '25m ago' },
+          { title: 'Gift redeemed', text: 'Congratulations! Your gift code was validated for ৳20.', time: '1h ago' }
+        ],
+        activity: [
+          { icon: '💳', title: 'Deposit approved', subtitle: 'TX-2048 • ৳1,500', amount: '+৳1,500' },
+          { icon: '🛍️', title: 'Product purchase', subtitle: 'Broiler Chicken Pack • Order #A-786', amount: '-৳500' },
+          { icon: '👥', title: 'Referral bonus', subtitle: 'Direct referral payout', amount: '+৳70' },
+          { icon: '🎁', title: 'Gift code', subtitle: 'AGRI-2026', amount: '+৳20' }
+        ]
       };
 
-      const seedTransactions = [
-        { id: "TX-101", userId: demoUser.id, type: "deposit", amount: 2500, status: "Approved", date: "2026-10-18 12:10", description: "Primary deposit" },
-        { id: "TX-102", userId: demoUser.id, type: "purchase", amount: 299, status: "Paid", date: "2026-10-20 14:22", description: "Emerald Growth Plan" },
-        { id: "TX-103", userId: demoUser.id, type: "referral_reward", amount: 120, status: "Approved", date: "2026-10-22 11:50", description: "Referral reward" },
-        { id: "TX-104", userId: demoUser.id, type: "withdrawal", amount: 300, status: "Pending", date: "2026-10-23 09:15", description: "Bank transfer request" },
-        { id: "TX-105", userId: demoUser.id, type: "purchase", amount: 499, status: "Paid", date: "2026-10-24 16:08", description: "Stable Yield Bundle" }
-      ];
-
-      const seedDeposits = [
-        { id: "DEP-201", userId: demoUser.id, amount: 2500, method: "Bank Transfer", reference: "TRX-3201", status: "Approved", date: "2026-10-18 12:10" },
-        { id: "DEP-202", userId: demoUser.id, amount: 550, method: "USDT", reference: "USDT-1A7", status: "Pending", date: "2026-10-24 10:05" }
-      ];
-
-      const seedWithdrawals = [
-        { id: "WTH-301", userId: demoUser.id, amount: 300, method: "Bank Account", destination: "Account ending 2451", status: "Pending", date: "2026-10-23 09:15" },
-        { id: "WTH-302", userId: demoUser.id, amount: 150, method: "E-Wallet", destination: "demo-wallet-01", status: "Rejected", date: "2026-10-15 08:44" }
-      ];
-
-      const seedNotifications = [
-        { id: "N-1", userId: demoUser.id, title: "Deposit confirmed", message: "Your deposit of $2,500 was approved.", time: "2h ago", read: false },
-        { id: "N-2", userId: demoUser.id, title: "Referral reward", message: "You earned a referral bonus of $120.", time: "1d ago", read: false },
-        { id: "N-3", userId: demoUser.id, title: "System update", message: "Security review completed. Your account is active.", time: "3d ago", read: true }
-      ];
-
-      const seedReferrals = [
-        { id: "R-1", userId: demoUser.id, name: "Aisha Khan", email: "aisha@demo.com", joinedAt: "2026-10-18", reward: 50, status: "Approved" },
-        { id: "R-2", userId: demoUser.id, name: "Leo Trend", email: "leo@demo.com", joinedAt: "2026-10-20", reward: 70, status: "Pending" }
-      ];
-
-      const seedOrders = [
-        { id: "ORD-5001", userId: demoUser.id, productId: "P-1001", productName: "Emerald Growth Plan", price: 299, date: "2026-10-20 14:22", status: "Paid", details: "Priority investor package" },
-        { id: "ORD-5002", userId: demoUser.id, productId: "P-1002", productName: "Stable Yield Bundle", price: 499, date: "2026-10-24 16:08", status: "Paid", details: "Low risk growth bundle" }
-      ];
-
-      return {
-        currentUser: null,
-        users: [demoUser],
-        products: productSeed,
-        orders: seedOrders,
-        transactions: seedTransactions,
-        deposits: seedDeposits,
-        withdrawals: seedWithdrawals,
-        notifications: seedNotifications,
-        referrals: seedReferrals
+      const viewMap = {
+        login: document.getElementById('loginForm'),
+        register: document.getElementById('registerForm')
       };
-    }
 
-    function loadState() {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) {
-        const initial = createInitialState();
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
-        Object.assign(appState, initial);
-        return;
-      }
-      try {
-        const parsed = JSON.parse(raw);
-        Object.assign(appState, parsed);
-      } catch (error) {
-        console.error("Invalid localStorage state:", error);
-        const fallback = createInitialState();
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(fallback));
-        Object.assign(appState, fallback);
-      }
-    }
-
-    function saveState() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
-    }
-
-    function formatCurrency(amount) {
-      return new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-        maximumFractionDigits: 0
-      }).format(Number(amount || 0));
-    }
-
-    function toMoney(value) {
-      return formatCurrency(value);
-    }
-
-    function showToast(message, type = "success") {
-      const toast = document.getElementById("toast");
-      toast.textContent = message;
-      toast.style.borderColor = type === "error" ? "rgba(255,106,106,0.32)" : "rgba(30,240,166,0.2)";
-      toast.classList.add("show");
-      setTimeout(() => toast.classList.remove("show"), 1800);
-    }
-
-    function setLoading(isLoading) {
-      const loader = document.getElementById("loader");
-      if (isLoading) loader.classList.add("show");
-      else loader.classList.remove("show");
-    }
-
-    function getUserByEmail(email) {
-      return appState.users.find(user => user.email.toLowerCase() === email.toLowerCase() || user.username.toLowerCase() === email.toLowerCase());
-    }
-
-    function generateId(prefix) {
-      const stamp = Date.now().toString(36).toUpperCase();
-      const rand = Math.random().toString(36).slice(2, 7).toUpperCase();
-      return `${prefix}-${stamp}-${rand}`;
-    }
-
-    function ensureCurrentUserState() {
-      if (!appState.currentUser) return;
-      const user = appState.users.find(u => u.id === appState.currentUser.id);
-      if (user) {
-        appState.currentUser = { ...user };
-      }
-    }
-
-    function showPage(pageId) {
-      pages.forEach(page => {
-        page.classList.toggle("active", page.id === pageId);
-      });
-
-      navButtons.forEach(btn => {
-        btn.classList.toggle("active", btn.dataset.page === pageId);
-      });
-    }
-
-    function refreshNavigation() {
-      const logged = !!appState.currentUser;
-      navButtons.forEach(button => {
-        const isVisible = logged;
-        button.style.display = isVisible ? "flex" : "none";
-      });
-      const headerUser = document.getElementById("headerUser");
-      if (!logged) {
-        headerUser.innerHTML = `<div class="avatar">D</div><span>Demo User</span>`;
-        showPage("authPage");
-      } else {
-        const user = appState.currentUser;
-        headerUser.innerHTML = `<div class="avatar">${(user.name || user.username || "D").charAt(0).toUpperCase()}</div><span>${user.name || user.username}</span>`;
-        showPage("dashboardPage");
-      }
-    }
-
-    function renderDashboardStats() {
-      const user = appState.currentUser;
-      if (!user) return;
-
-      const totalDeposit = appState.transactions
-        .filter(tx => tx.userId === user.id && tx.type === "deposit" && tx.status.toLowerCase() === "approved")
-        .reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
-
-      const totalWithdrawal = appState.transactions
-        .filter(tx => tx.userId === user.id && tx.type === "withdrawal" && tx.status.toLowerCase() === "approved")
-        .reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
-
-      const totalProductPurchases = appState.transactions
-        .filter(tx => tx.userId === user.id && tx.type === "purchase")
-        .reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
-
-      const referralRewards = appState.transactions
-        .filter(tx => tx.userId === user.id && tx.type === "referral_reward")
-        .reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
-
-      const invitedMembers = appState.referrals.filter(ref => ref.userId === user.id).length;
-
-      const stats = [
-        { label: "Available Balance", value: toMoney(user.balance || 0), meta: "Updated", trend: "up" },
-        { label: "Total Deposit", value: toMoney(totalDeposit), meta: "Approved", trend: "up" },
-        { label: "Total Withdrawal", value: toMoney(totalWithdrawal), meta: "Completed", trend: "down" },
-        { label: "Total Product Purchases", value: toMoney(totalProductPurchases), meta: "Orders", trend: "up" },
-        { label: "Referral Rewards", value: toMoney(referralRewards), meta: "Earned", trend: "up" },
-        { label: "Total Invited Members", value: String(invitedMembers), meta: "Members", trend: "up" }
-      ];
-
-      document.getElementById("dashboardStats").innerHTML = stats.map(stat => `
-        <div class="stat-card">
-          <span class="label">${stat.label}</span>
-          <div class="stat-value">${stat.value}</div>
-          <div class="stat-meta">
-            <span>${stat.meta}</span>
-            <span class="trend ${stat.trend}">${stat.trend === "up" ? "▲" : "▼"}</span>
-          </div>
-        </div>
-      `).join("");
-    }
-
-    function renderRecentTx() {
-      const user = appState.currentUser;
-      if (!user) return;
-      const list = appState.transactions
-        .filter(tx => tx.userId === user.id)
-        .sort((a, b) => new Date(b.date) - new Date(a.date))
-        .slice(0, 5);
-
-      const container = document.getElementById("recentTxList");
-      document.getElementById("transactionBadge").textContent = list.length;
-
-      if (!list.length) {
-        container.innerHTML = `<div class="empty">No recent transactions</div>`;
-        return;
+      function setActiveAuth(view) {
+        document.querySelectorAll('.auth-tab').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.view === view);
+        });
+        Object.entries(viewMap).forEach(([name, form]) => {
+          form.classList.toggle('active', name === view);
+        });
       }
 
-      container.innerHTML = list.map(tx => {
-        const icon = {
-          deposit: "💰",
-          withdrawal: "🏦",
-          purchase: "🛍️",
-          referral_reward: "🎁"
-        }[tx.type] || "📄";
+      function showPage(pageId) {
+        document.querySelectorAll('.page').forEach(page => {
+          page.classList.toggle('active', page.id === pageId);
+        });
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.target === pageId);
+        });
+      }
 
-        return `
-          <div class="item">
-            <div class="item-main">
-              <div class="icon-box">${icon}</div>
-              <div class="item-text">
-                <strong>${tx.description || tx.type}</strong>
-                <small>${tx.date}</small>
-              </div>
+      function showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.classList.add('show');
+        clearTimeout(showToast.timer);
+        showToast.timer = setTimeout(() => toast.classList.remove('show'), 2200);
+      }
+
+      function setLoader(show) {
+        document.getElementById('loader').classList.toggle('show', show);
+      }
+
+      function renderFeaturedProducts() {
+        const grid = document.getElementById('featuredProductGrid');
+        const items = state.products.slice(0, 4);
+        grid.innerHTML = items.map(product => `
+          <article class="product-card">
+            <div class="product-image" style="background-image:url('${product.image}')">
+              <span class="product-chip">${product.category}</span>
             </div>
-            <div>
-              <div class="amount">${tx.type === "purchase" || tx.type === "withdrawal" ? "-" : "+"}${toMoney(tx.amount)}</div>
-              <div class="status-pill status-${(tx.status || "pending").toLowerCase().replace(/\s+/g, "-")}">${tx.status}</div>
-            </div>
-          </div>
-        `;
-      }).join("");
-    }
-
-    function renderDashboardNotifications() {
-      const user = appState.currentUser;
-      if (!user) return;
-      const notifications = appState.notifications.filter(n => n.userId === user.id).slice(0, 3);
-      const container = document.getElementById("dashboardNotifications");
-      const badge = document.getElementById("notificationBadge");
-      badge.textContent = notifications.length;
-
-      if (!notifications.length) {
-        container.innerHTML = `<div class="empty">No notifications</div>`;
-        return;
-      }
-
-      container.innerHTML = notifications.map(item => `
-        <div class="item">
-          <div class="item-main">
-            <div class="icon-box">🔔</div>
-            <div class="item-text">
-              <strong>${item.title}</strong>
-              <small>${item.message}</small>
-            </div>
-          </div>
-          <div>
-            <div class="status-pill status-pending">${item.time}</div>
-          </div>
-        </div>
-      `).join("");
-    }
-
-    function renderProducts() {
-      const container = document.getElementById("productGrid");
-      if (!appState.products.length) {
-        container.innerHTML = `<div class="empty">No products available.</div>`;
-        return;
-      }
-
-      container.innerHTML = appState.products.map(product => `
-        <article class="product-card">
-          <div class="product-image" style="background-image:url('${product.image}')">
-            <span class="product-chip">Featured</span>
-          </div>
-          <div class="product-body">
-            <div class="product-header">
-              <div>
+            <div class="product-body">
+              <div class="product-head">
                 <h3 class="product-name">${product.name}</h3>
-                <div class="product-id">${product.id}</div>
+                <span class="product-price">৳${product.price}</span>
               </div>
-              <div class="product-price">${toMoney(product.price)}</div>
-            </div>
-            <div class="product-desc">${product.description}</div>
-            <div class="product-details">
-              ${product.details.map(detail => `<span class="product-detail">${detail}</span>`).join("")}
-            </div>
-            <button class="primary-btn buy-product" data-product-id="${product.id}" type="button">Buy Now</button>
-          </div>
-        </article>
-      `).join("");
-    }
-
-    function renderDepositHistory() {
-      const user = appState.currentUser;
-      if (!user) return;
-      const deposits = appState.deposits.filter(item => item.userId === user.id).slice().reverse();
-      const container = document.getElementById("depositHistory");
-      if (!deposits.length) {
-        container.innerHTML = `<div class="empty">No deposit history yet.</div>`;
-        return;
-      }
-
-      container.innerHTML = deposits.map(item => `
-        <div class="item">
-          <div class="item-main">
-            <div class="icon-box">💳</div>
-            <div class="item-text">
-              <strong>${item.method}</strong>
-              <small>${item.reference}</small>
-            </div>
-          </div>
-          <div>
-            <div class="amount">${toMoney(item.amount)}</div>
-            <div class="status-pill status-${(item.status || "pending").toLowerCase().replace(/\s+/g, "-")}">${item.status}</div>
-          </div>
-        </div>
-      `).join("");
-    }
-
-    function renderWithdrawHistory() {
-      const user = appState.currentUser;
-      if (!user) return;
-      const withdrawals = appState.withdrawals.filter(item => item.userId === user.id).slice().reverse();
-      const container = document.getElementById("withdrawHistory");
-      if (!withdrawals.length) {
-        container.innerHTML = `<div class="empty">No withdrawal history yet.</div>`;
-        return;
-      }
-
-      container.innerHTML = withdrawals.map(item => `
-        <div class="item">
-          <div class="item-main">
-            <div class="icon-box">🏦</div>
-            <div class="item-text">
-              <strong>${item.method}</strong>
-              <small>${item.destination}</small>
-            </div>
-          </div>
-          <div>
-            <div class="amount">${toMoney(item.amount)}</div>
-            <div class="status-pill status-${(item.status || "pending").toLowerCase().replace(/\s+/g, "-")}">${item.status}</div>
-          </div>
-        </div>
-      `).join("");
-    }
-
-    function renderReferralPage() {
-      const user = appState.currentUser;
-      if (!user) return;
-
-      const refCode = document.getElementById("refCodeDisplay");
-      const refLink = document.getElementById("refLinkDisplay");
-
-      refCode.value = user.referralCode || "EMERD10";
-      refLink.value = `https://example.com/register?ref=${user.referralCode || "EMERD10"}`;
-
-      const referralList = appState.referrals.filter(item => item.userId === user.id);
-
-      document.getElementById("refStats").innerHTML = `
-        <span class="mini-pill">Code: ${user.referralCode}</span>
-        <span class="mini-pill">Invited: ${referralList.length}</span>
-        <span class="mini-pill">Rewards: ${toMoney(referralList.reduce((sum, item) => sum + Number(item.reward || 0), 0))}</span>
-      `;
-
-      const membersList = document.getElementById("invitedMembersList");
-      membersList.innerHTML = referralList.length
-        ? referralList.map(item => `
-          <div class="item">
-            <div class="item-main">
-              <div class="icon-box">👤</div>
-              <div class="item-text">
-                <strong>${item.name}</strong>
-                <small>${item.email}</small>
+              <div class="product-meta">
+                <span class="tiny-tag">${product.stock} left</span>
+                <span class="tiny-tag">Secure order</span>
+              </div>
+              <p class="product-desc">${product.desc}</p>
+              <div class="product-action">
+                <button class="ghost-btn" data-product-detail="${product.name}">Details</button>
+                <button class="primary-btn" data-buy-product="${product.name}">Buy</button>
               </div>
             </div>
-            <div>
-              <div class="amount">${toMoney(item.reward || 0)}</div>
-              <div class="status-pill status-${(item.status || "pending").toLowerCase().replace(/\s+/g, "-")}">${item.status}</div>
-            </div>
-          </div>
-        `).join("")
-        : `<div class="empty">No invited members yet.</div>`;
-
-      const rewardHistory = document.getElementById("rewardHistory");
-      const rewardTx = appState.transactions.filter(tx => tx.userId === user.id && tx.type === "referral_reward").slice().reverse();
-      rewardHistory.innerHTML = rewardTx.length
-        ? rewardTx.map(tx => `
-          <div class="item">
-            <div class="item-main">
-              <div class="icon-box">🎁</div>
-              <div class="item-text">
-                <strong>${tx.description}</strong>
-                <small>${tx.date}</small>
-              </div>
-            </div>
-            <div>
-              <div class="amount">${toMoney(tx.amount)}</div>
-              <div class="status-pill status-${(tx.status || "pending").toLowerCase().replace(/\s+/g, "-")}">${tx.status}</div>
-            </div>
-          </div>
-        `).join("")
-        : `<div class="empty">No referral rewards yet.</div>`;
-    }
-
-    function renderOrders() {
-      const user = appState.currentUser;
-      if (!user) return;
-      const list = appState.orders.filter(order => order.userId === user.id).slice().reverse();
-      const container = document.getElementById("ordersList");
-      document.getElementById("myProductsCount").textContent = list.length;
-
-      if (!list.length) {
-        container.innerHTML = `<div class="empty">No purchase history yet. Visit the marketplace to buy a product.</div>`;
-        return;
+          </article>
+        `).join('');
       }
 
-      container.innerHTML = list.map(order => `
-        <div class="item">
-          <div class="item-main">
-            <div class="icon-box">📦</div>
-            <div class="item-text">
-              <strong>${order.productName}</strong>
-              <small>Order ID: ${order.id} • ${order.date}</small>
-            </div>
-          </div>
-          <div style="text-align:right;">
-            <div class="amount">${toMoney(order.price)}</div>
-            <div class="status-pill status-${(order.status || "pending").toLowerCase().replace(/\s+/g, "-")}">${order.status}</div>
-            <div style="font-size:11px; color:var(--muted); margin-top:6px;">${order.details}</div>
-          </div>
-        </div>
-      `).join("");
-    }
-
-    function renderTransactionsTable() {
-      const user = appState.currentUser;
-      if (!user) return;
-
-      const searchTerm = document.getElementById("transactionSearch").value.trim().toLowerCase();
-      const filter = document.getElementById("transactionFilter").value;
-
-      let filtered = appState.transactions.filter(tx => tx.userId === user.id);
-
-      if (filter !== "all") filtered = filtered.filter(tx => tx.type === filter);
-      if (searchTerm) {
-        filtered = filtered.filter(tx =>
-          String(tx.id).toLowerCase().includes(searchTerm) ||
-          String(tx.type).toLowerCase().includes(searchTerm) ||
-          String(tx.description || "").toLowerCase().includes(searchTerm)
-        );
-      }
-
-      const tbody = document.getElementById("transactionsTableBody");
-      if (!filtered.length) {
-        tbody.innerHTML = `<tr><td colspan="5"><div class="empty">No transactions match your search.</div></td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = filtered.slice().reverse().map(tx => `
-        <tr>
-          <td>${tx.id}</td>
-          <td>${tx.type}</td>
-          <td>${toMoney(tx.amount)}</td>
-          <td><span class="status-pill status-${(tx.status || "pending").toLowerCase().replace(/\s+/g, "-")}">${tx.status}</span></td>
-          <td>${tx.date}</td>
-        </tr>
-      `).join("");
-    }
-
-    function renderProfile() {
-      const user = appState.currentUser;
-      if (!user) return;
-
-      const profilePanel = document.getElementById("profilePanel");
-      const totalRewards = appState.transactions
-        .filter(tx => tx.userId === user.id && tx.type === "referral_reward")
-        .reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
-
-      profilePanel.innerHTML = `
-        <div class="stats-strip">
-          <span class="mini-pill">User ID: ${user.id}</span>
-          <span class="mini-pill">Demo Mode</span>
-          <span class="mini-pill">Ref: ${user.referralCode}</span>
-        </div>
-
-        <div class="helper-list" style="margin-top:12px;">
-          <div class="helper-item">
-            <h4>${user.name}</h4>
-            <p>
-              Username: ${user.username}<br />
-              Email: ${user.email}<br />
-              Balance: ${toMoney(user.balance)}<br />
-              Rewards: ${toMoney(totalRewards)}
-            </p>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderNotifications() {
-      const user = appState.currentUser;
-      if (!user) return;
-      const notifications = appState.notifications.filter(n => n.userId === user.id);
-      const fullList = document.getElementById("fullNotificationsList");
-      const count = document.getElementById("notiCount");
-      count.textContent = notifications.length;
-
-      if (!notifications.length) {
-        fullList.innerHTML = `<div class="empty">No notifications.</div>`;
-        return;
-      }
-
-      fullList.innerHTML = notifications.map(item => `
-        <div class="item">
-          <div class="item-main">
-            <div class="icon-box">🔔</div>
-            <div class="item-text">
-              <strong>${item.title}</strong>
-              <small>${item.message}</small>
-            </div>
-          </div>
-          <div>
-            <div class="status-pill status-${item.read ? "approved" : "pending"}">${item.read ? "Read" : "New"}</div>
-          </div>
-        </div>
-      `).join("");
-    }
-
-    function renderAll() {
-      ensureCurrentUserState();
-      const logged = !!appState.currentUser;
-
-      if (logged) {
-        renderDashboardStats();
-        renderRecentTx();
-        renderDashboardNotifications();
-        renderProducts();
-        renderDepositHistory();
-        renderWithdrawHistory();
-        renderReferralPage();
-        renderOrders();
-        renderTransactionsTable();
-        renderProfile();
-        renderNotifications();
-      }
-    }
-
-    function loginUser(email, password) {
-      const existing = getUserByEmail(email);
-
-      if (!existing) {
-        showToast("User not found. Please register or use demo account.", "error");
-        return;
-      }
-
-      if (existing.password !== password) {
-        showToast("Incorrect password. Use the demo account or reset demo data.", "error");
-        return;
-      }
-
-      appState.currentUser = { ...existing };
-      saveState();
-      refreshNavigation();
-      renderAll();
-      showToast("Login successful. Demo session activated.");
-    }
-
-    function registerUser(data) {
-      const fullName = (data.name || "").trim();
-      const email = (data.email || "").trim();
-      const username = (data.username || "").trim();
-      const password = (data.password || "").trim();
-      const refCode = (data.ref || "").trim().toUpperCase();
-
-      if (!fullName || !email || !username || !password) {
-        showToast("All fields are required.", "error");
-        return;
-      }
-      if (password.length < 6) {
-        showToast("Password must be at least 6 characters.", "error");
-        return;
-      }
-      if (appState.users.some(user => user.email.toLowerCase() === email.toLowerCase() || user.username.toLowerCase() === username.toLowerCase())) {
-        showToast("This email or username already exists.", "error");
-        return;
-      }
-
-      const newUser = {
-        id: `U-${Math.floor(10000 + Math.random() * 90000)}`,
-        name: fullName,
-        email,
-        username,
-        password,
-        referralCode: refCode || `EMERD${Math.floor(100 + Math.random() * 900)}`,
-        balance: 2500,
-        createdAt: new Date().toISOString()
-      };
-
-      appState.users.push(newUser);
-      appState.currentUser = { ...newUser };
-      appState.notifications.push({
-        id: generateId("N"),
-        userId: newUser.id,
-        title: "Welcome aboard",
-        message: "Your demo account has been created successfully.",
-        time: "Just now",
-        read: false
-      });
-      saveState();
-      refreshNavigation();
-      renderAll();
-      showToast("Demo account created successfully.");
-    }
-
-    function handleBuyProduct(productId) {
-      const product = appState.products.find(item => item.id === productId);
-      if (!product) return;
-
-      const modal = document.getElementById("buyModal");
-      const body = document.getElementById("buyModalBody");
-      body.innerHTML = `
-        <div class="helper-item">
-          <h4>${product.name}</h4>
-          <p>Product ID: ${product.id}</p>
-          <p>Price: ${toMoney(product.price)}</p>
-          <p>Note: Demo mode creates a sample order. No real payment is taken.</p>
-        </div>
-      `;
-      modal.classList.add("show");
-      modal.dataset.productId = product.id;
-    }
-
-    function confirmBuy() {
-      const modal = document.getElementById("buyModal");
-      const productId = modal.dataset.productId;
-      const product = appState.products.find(item => item.id === productId);
-      const user = appState.currentUser;
-
-      if (!product || !user) {
-        showToast("Unable to complete purchase.", "error");
-        return;
-      }
-
-      const orderId = `ORD-${Math.floor(1000 + Math.random() * 9000)}`;
-      const now = new Date();
-      const order = {
-        id: orderId,
-        userId: user.id,
-        productId: product.id,
-        productName: product.name,
-        price: product.price,
-        date: now.toLocaleString("en-GB", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }).replace(",", ""),
-        status: "Paid",
-        details: "Demo purchase is created successfully."
-      };
-
-      appState.orders.push(order);
-      appState.transactions.push({
-        id: `TX-${Math.floor(10000 + Math.random() * 90000)}`,
-        userId: user.id,
-        type: "purchase",
-        amount: product.price,
-        status: "Paid",
-        date: now.toLocaleString("en-GB", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }).replace(",", ""),
-        description: product.name
-      });
-
-      user.balance = Number(user.balance || 0) - Number(product.price);
-      const targetUser = appState.users.find(item => item.id === user.id);
-      if (targetUser) targetUser.balance = Number(targetUser.balance || 0) - Number(product.price);
-
-      appState.notifications.push({
-        id: generateId("N"),
-        userId: user.id,
-        title: "Order completed",
-        message: `Your demo order for ${product.name} has been created.`,
-        time: "Just now",
-        read: false
-      });
-
-      saveState();
-      renderAll();
-      modal.classList.remove("show");
-      showToast("Sample purchase created under My Products.");
-    }
-
-    function submitDeposit(event) {
-      event.preventDefault();
-      const amount = Number(document.getElementById("depositAmount").value);
-      const method = document.getElementById("depositMethod").value.trim();
-      const reference = document.getElementById("depositReference").value.trim();
-
-      if (!amount || amount < 10) {
-        showToast("Deposit amount must be at least $10.", "error");
-        return;
-      }
-      if (!method) {
-        showToast("Select a payment method.", "error");
-        return;
-      }
-      if (!reference) {
-        showToast("Enter a transaction reference.", "error");
-        return;
-      }
-
-      const user = appState.currentUser;
-      if (!user) {
-        showToast("Please log in to submit a deposit request.", "error");
-        return;
-      }
-
-      setLoading(true);
-
-      setTimeout(() => {
-        const entry = {
-          id: `DEP-${Math.floor(1000 + Math.random() * 9000)}`,
-          userId: user.id,
-          amount,
-          method,
-          reference,
-          status: "Pending",
-          date: new Date().toLocaleString("en-GB", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }).replace(",", "")
-        };
-
-        appState.deposits.push(entry);
-        appState.transactions.push({
-          id: `TX-${Math.floor(10000 + Math.random() * 90000)}`,
-          userId: user.id,
-          type: "deposit",
-          amount,
-          status: "Pending",
-          date: entry.date,
-          description: `Deposit request via ${method}`
-        });
-
-        appState.notifications.push({
-          id: generateId("N"),
-          userId: user.id,
-          title: "Deposit request sent",
-          message: `Your ${toMoney(amount)} deposit request is pending approval.`,
-          time: "Just now",
-          read: false
-        });
-
-        saveState();
-        renderAll();
-        document.getElementById("depositForm").reset();
-        setLoading(false);
-        showToast("Deposit request submitted successfully in demo mode.");
-      }, 600);
-    }
-
-    function submitWithdrawal(event) {
-      event.preventDefault();
-      const amount = Number(document.getElementById("withdrawAmount").value);
-      const method = document.getElementById("withdrawMethod").value.trim();
-      const destination = document.getElementById("withdrawDestination").value.trim();
-
-      if (!amount || amount < 100) {
-        showToast("Withdrawal amount must be at least $100.", "error");
-        return;
-      }
-      if (!method) {
-        showToast("Select a withdrawal method.", "error");
-        return;
-      }
-      if (!destination) {
-        showToast("Enter destination details.", "error");
-        return;
-      }
-
-      const user = appState.currentUser;
-      if (!user) {
-        showToast("Please log in to submit a withdrawal request.", "error");
-        return;
-      }
-
-      setLoading(true);
-
-      setTimeout(() => {
-        const entry = {
-          id: `WTH-${Math.floor(1000 + Math.random() * 9000)}`,
-          userId: user.id,
-          amount,
-          method,
-          destination,
-          status: "Pending",
-          date: new Date().toLocaleString("en-GB", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }).replace(",", "")
-        };
-
-        appState.withdrawals.push(entry);
-        appState.transactions.push({
-          id: `TX-${Math.floor(10000 + Math.random() * 90000)}`,
-          userId: user.id,
-          type: "withdrawal",
-          amount,
-          status: "Pending",
-          date: entry.date,
-          description: `Withdrawal via ${method}`
-        });
-
-        appState.notifications.push({
-          id: generateId("N"),
-          userId: user.id,
-          title: "Withdrawal request sent",
-          message: `Your ${toMoney(amount)} withdrawal request is pending review.`,
-          time: "Just now",
-          read: false
-        });
-
-        saveState();
-        renderAll();
-        document.getElementById("withdrawForm").reset();
-        setLoading(false);
-        showToast("Withdrawal request submitted. No real transfer was made.");
-      }, 600);
-    }
-
-    function copyReferralLink() {
-      const value = document.getElementById("refLinkDisplay").value;
-      if (!value) {
-        showToast("Referral link not available.", "error");
-        return;
-      }
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(value).then(() => {
-          showToast("Referral link copied.");
-        }).catch(() => {
-          showToast("Copy failed. You can copy manually.", "error");
-        });
-      } else {
-        document.getElementById("refLinkDisplay").select();
-        document.execCommand("copy");
-        showToast("Referral link copied.");
-      }
-    }
-
-    function resetDemoData() {
-      if (!confirm("Reset all demo data? This will restore the preset demo state.")) return;
-      const resetState = createInitialState();
-      Object.assign(appState, resetState);
-      appState.currentUser = null;
-      saveState();
-      refreshNavigation();
-      showToast("Demo data reset successfully.");
-      document.getElementById("resetDemoDataBtn").blur();
-    }
-
-    function logout() {
-      appState.currentUser = null;
-      saveState();
-      refreshNavigation();
-      showToast("Logged out. Demo session ended.");
-    }
-
-    function bindEvents() {
-      navButtons.forEach(button => {
-        button.addEventListener("click", () => {
-          const targetPage = button.dataset.page;
-          if (appState.currentUser || targetPage === "authPage") {
-            showPage(targetPage);
-          } else {
-            showPage("authPage");
-          }
-        });
-      });
-
-      document.querySelectorAll(".quick-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const page = btn.dataset.page;
-          if (appState.currentUser) showPage(page);
-        });
-      });
-
-      document.querySelectorAll(".auth-tab").forEach(tab => {
-        tab.addEventListener("click", () => {
-          const target = tab.dataset.auth;
-          document.querySelectorAll(".auth-form").forEach(form => {
-            form.classList.toggle("active", form.id === (`${target}Form`));
-          });
-          document.querySelectorAll(".auth-tab").forEach(t => t.classList.toggle("active", t === tab));
-        });
-      });
-
-      document.getElementById("useDemoAccountBtn").addEventListener("click", () => {
-        document.getElementById("loginEmail").value = "demo@emeraldtrade.demo";
-        document.getElementById("loginPassword").value = "demo1234";
-      });
-
-      document.getElementById("demoModeBtn").addEventListener("click", () => {
-        showToast("Demo mode active. Use the demo account to explore the panel.");
-      });
-
-      document.getElementById("loginForm").addEventListener("submit", (event) => {
-        event.preventDefault();
-        const email = document.getElementById("loginEmail").value.trim();
-        const password = document.getElementById("loginPassword").value.trim();
-        loginUser(email, password);
-      });
-
-      document.getElementById("registerForm").addEventListener("submit", (event) => {
-        event.preventDefault();
-        const formData = {
-          name: document.getElementById("regName").value,
-          email: document.getElementById("regEmail").value,
-          username: document.getElementById("regUsername").value,
-          password: document.getElementById("regPassword").value,
-          ref: document.getElementById("regRef").value
-        };
-        registerUser(formData);
-      });
-
-      document.addEventListener("click", (event) => {
-        const buyBtn = event.target.closest(".buy-product");
-        if (buyBtn) {
-          handleBuyProduct(buyBtn.dataset.productId);
-        }
-      });
-
-      document.getElementById("closeBuyModal").addEventListener("click", () => {
-        document.getElementById("buyModal").classList.remove("show");
-      });
-
-      document.getElementById("cancelBuy").addEventListener("click", () => {
-        document.getElementById("buyModal").classList.remove("show");
-      });
-
-      document.getElementById("confirmBuy").addEventListener("click", confirmBuy);
-
-      document.getElementById("depositForm").addEventListener("submit", submitDeposit);
-      document.getElementById("withdrawForm").addEventListener("submit", submitWithdrawal);
-
-      document.getElementById("copyReferralBtn").addEventListener("click", copyReferralLink);
-      document.getElementById("shareReferralBtn").addEventListener("click", () => {
-        const val = document.getElementById("refLinkDisplay").value;
-        if (!val) {
-          showToast("No referral link available", "error");
+      function renderProducts(category = 'Chicken') {
+        const list = state.products.filter(product => product.category === category || (category === 'All' ? true : false));
+        const container = document.getElementById('productsList');
+        if (!list.length) {
+          container.innerHTML = '<div class="empty-state">No products available in this category right now.</div>';
           return;
         }
-        if (navigator.share) {
-          navigator.share({
-            title: "EmeraldTrade Referral",
-            text: "Join me on EmeraldTrade",
-            url: val
-          }).catch(() => showToast("Share cancelled."));
-        } else {
-          copyReferralLink();
+        container.innerHTML = list.map(product => `
+          <article class="product-card">
+            <div class="product-image" style="background-image:url('${product.image}')">
+              <span class="product-chip">${product.category}</span>
+            </div>
+            <div class="product-body">
+              <div class="product-head">
+                <h3 class="product-name">${product.name}</h3>
+                <span class="product-price">৳${product.price}</span>
+              </div>
+              <div class="product-meta">
+                <span class="tiny-tag">${product.stock} left</span>
+                <span class="tiny-tag">Verified source</span>
+              </div>
+              <p class="product-desc">${product.desc}</p>
+              <div class="product-action">
+                <button class="ghost-btn" data-product-detail="${product.name}">Details</button>
+                <button class="primary-btn" data-buy-product="${product.name}">Buy now</button>
+              </div>
+            </div>
+          </article>
+        `).join('');
+      }
+
+      function renderDepositHistory() {
+        const container = document.getElementById('depositHistoryList');
+        if (!state.deposits.length) {
+          container.innerHTML = '<div class="empty-state">No deposit history yet.</div>';
+          return;
         }
-      });
+        container.innerHTML = state.deposits.map(item => `
+          <div class="list-item">
+            <div class="list-main">
+              <div class="list-icon">💸</div>
+              <div class="list-text">
+                <strong>${item.method} deposit</strong>
+                <small>${item.id} • ${new Date().toLocaleDateString()}</small>
+              </div>
+            </div>
+            <div>
+              <div class="list-amount">৳${item.amount}</div>
+              <div class="status-pill ${statusClass(item.status)}">${item.status}</div>
+            </div>
+          </div>
+        `).join('');
+      }
 
-      document.getElementById("logoutBtn").addEventListener("click", logout);
-      document.getElementById("resetDemoDataBtn").addEventListener("click", resetDemoData);
-
-      document.getElementById("transactionSearch").addEventListener("input", renderTransactionsTable);
-      document.getElementById("transactionFilter").addEventListener("change", renderTransactionsTable);
-
-      document.getElementById("buyModal").addEventListener("click", (event) => {
-        if (event.target.id === "buyModal") {
-          document.getElementById("buyModal").classList.remove("show");
+      function renderWithdrawHistory() {
+        const container = document.getElementById('withdrawHistoryList');
+        if (!state.withdrawals.length) {
+          container.innerHTML = '<div class="empty-state">No withdrawal history yet.</div>';
+          return;
         }
-      });
-    }
+        container.innerHTML = state.withdrawals.map(item => `
+          <div class="list-item">
+            <div class="list-main">
+              <div class="list-icon">🏦</div>
+              <div class="list-text">
+                <strong>${item.method} withdrawal</strong>
+                <small>${item.recipient}</small>
+              </div>
+            </div>
+            <div>
+              <div class="list-amount">৳${item.amount}</div>
+              <div class="status-pill ${statusClass(item.status)}">${item.status}</div>
+            </div>
+          </div>
+        `).join('');
+      }
 
-    function initialize() {
-      loadState();
-      bindEvents();
-      refreshNavigation();
-      renderAll();
-    }
+      function renderRecentActivity() {
+        const container = document.getElementById('recentActivityList');
+        document.getElementById('activityCount').textContent = state.activity.length;
+        container.innerHTML = state.activity.map(item => `
+          <div class="list-item">
+            <div class="list-main">
+              <div class="list-icon">${item.icon}</div>
+              <div class="list-text">
+                <strong>${item.title}</strong>
+                <small>${item.subtitle}</small>
+              </div>
+            </div>
+            <div class="list-amount" style="font-size: 0.95rem;">${item.amount}</div>
+          </div>
+        `).join('');
+      }
 
-    initialize();
-  </script>
-</body>
+      function renderNotifications() {
+        const badge = document.getElementById('notifBadge');
+        const topBadge = document.getElementById('notificationBadgeTop');
+        const list = document.getElementById('fullNotificationsList');
+        const count = state.notifications.length;
+        badge.textContent = count;
+        if (topBadge) topBadge.textContent = count;
+        list.innerHTML = state.notifications.map(item => `
+          <div class="list-item">
+            <div class="list-main">
+              <div class="list-icon">🔔</div>
+              <div class="list-text">
+                <strong>${item.title}</strong>
+                <small>${item.text}</small>
+              </div>
+            </div>
+            <small style="color: var(--muted);">${item.time}</small>
+          </div>
+        `).join('');
+      }
+
+      function statusClass(status) {
+        const map = {
+          Approved: 'status-approved',
+          Pending: 'status-pending',
+          'Under Review': 'status-processing',
+          Rejected: 'status-rejected',
+          Paid: 'status-paid'
+        };
+        return map[status] || 'status-pending';
+      }
+
+      function bindActions() {
+        document.querySelectorAll('.auth-tab').forEach(btn => {
+          btn.addEventListener('click', () => setActiveAuth(btn.dataset.view));
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+          e.preventDefault();
+          setLoader(true);
+          setTimeout(() => {
+            setLoader(false);
+            showPage('mainPage');
+            showToast('Login successful. Welcome back.');
+          }, 700);
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', (e) => {
+          e.preventDefault();
+          setLoader(true);
+          setTimeout(() => {
+            setLoader(false);
+            showPage('otpPage');
+            showToast('OTP sent to your mobile number.');
+          }, 700);
+        });
+
+        document.getElementById('otpForm').addEventListener('submit', (e) => {
+          e.preventDefault();
+          setLoader(true);
+          setTimeout(() => {
+            setLoader(false);
+            showPage('mainPage');
+            showToast('Phone verified successfully.');
+          }, 700);
+        });
+
+        document.getElementById('demoLoginBtn').addEventListener('click', () => {
+          document.getElementById('loginPhone').value = '01712345678';
+          document.getElementById('loginPassword').value = 'demo123';
+          showPage('mainPage');
+        });
+
+        document.getElementById('otpAssistBtn').addEventListener('click', () => {
+          showPage('otpPage');
+        });
+
+        document.getElementById('backToLoginBtn').addEventListener('click', () => {
+          showPage('authPage');
+          setActiveAuth('login');
+        });
+
+        document.getElementById('resendOtpBtn').addEventListener('click', () => {
+          showToast('OTP resent successfully.');
+        });
+
+        document.querySelectorAll('[data-target]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const target = btn.dataset.target;
+            if (target === 'mainPage') showPage('mainPage');
+            else showPage(target);
+          });
+        });
+
+        document.getElementById('notificationBtn').addEventListener('click', () => {
+          showPage('notificationsPage');
+        });
+
+        document.querySelectorAll('.category-pill').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.category-pill').forEach(item => item.classList.remove('active'));
+            btn.classList.add('active');
+            const category = btn.dataset.category || btn.textContent.trim();
+            renderProducts(category);
+          });
+        });
+
+        document.getElementById('redeemGiftBtn').addEventListener('click', () => {
+          const giftCode = document.getElementById('giftCodeInput').value.trim();
+          if (!giftCode) {
+            showToast('Enter your gift code first.');
+            return;
+          }
+          const visual = document.getElementById('giftVisual');
+          visual.animate(
+            [
+              { transform: 'rotate(0deg) scale(1)' },
+              { transform: 'rotate(12deg) scale(1.08)' },
+              { transform: 'rotate(-10deg) scale(1.14)' },
+              { transform: 'rotate(0deg) scale(1)', filter: 'brightness(1.3)' }
+            ],
+            { duration: 600, easing: 'ease-out' }
+          );
+          showToast('Gift code validated. Reward: ৳20');
+        });
+
+        document.getElementById('depositForm').addEventListener('submit', (e) => {
+          e.preventDefault();
+          const amount = Number(document.getElementById('depositAmount').value);
+          const trx = document.getElementById('depositTrx').value.trim();
+          if (!amount || !trx) return;
+          setLoader(true);
+          setTimeout(() => {
+            setLoader(false);
+            state.deposits.unshift({ method: document.getElementById('depositMethod').value, amount, id: trx, status: 'Pending' });
+            renderDepositHistory();
+            document.getElementById('successContent').innerHTML = '<strong>Deposit request submitted successfully.</strong><br />Your payment is in review and will be credited after verification.';
+            document.getElementById('successModal').classList.add('show');
+            showToast('Deposit submitted successfully.');
+            document.getElementById('depositForm').reset();
+          }, 700);
+        });
+
+        document.getElementById('withdrawForm').addEventListener('submit', (e) => {
+          e.preventDefault();
+          const amount = Number(document.getElementById('withdrawAmount').value);
+          if (!amount) return;
+          setLoader(true);
+          setTimeout(() => {
+            setLoader(false);
+            state.withdrawals.unshift({ method: document.getElementById('withdrawMethod').value, amount, recipient: document.getElementById('withdrawRecipient').value, status: 'Pending' });
+            renderWithdrawHistory();
+            document.getElementById('successContent').innerHTML = '<strong>Withdrawal request submitted successfully.</strong><br />Funds are reserved until payout review is completed.';
+            document.getElementById('successModal').classList.add('show');
+            showToast('Withdrawal request submitted successfully.');
+            document.getElementById('withdrawForm').reset();
+          }, 700);
+        });
+
+        document.getElementById('copyNumberBtn').addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText('01865255493');
+            showToast('Payment number copied.');
+          } catch (error) {
+            showToast('Number: 01865255493');
+          }
+        });
+
+        document.getElementById('copyReferralBtn').addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText('https://agriluma.app/invite/AGRI-2026');
+            showToast('Referral link copied.');
+          } catch (error) {
+            showToast('Referral link: https://agriluma.app/invite/AGRI-2026');
+          }
+        });
+
+        document.getElementById('sendMoneyBtn').addEventListener('click', () => {
+          showToast('Please send payment to 01865255493 using your chosen method.');
+        });
+
+        document.getElementById('successModal').addEventListener('click', (event) => {
+          if (event.target.id === 'successModal' || event.target.classList.contains('close-modal')) {
+            document.getElementById('successModal').classList.remove('show');
+          }
+        });
+
+        document.addEventListener('click', (event) => {
+          const buyBtn = event.target.closest('[data-buy-product]');
+          if (buyBtn) {
+            const productName = buyBtn.dataset.buyProduct;
+            const product = state.products.find(item => item.name === productName);
+            if (!product) return;
+            setLoader(true);
+            setTimeout(() => {
+              setLoader(false);
+              document.getElementById('successContent').innerHTML = `<strong>Product purchased successfully.</strong><br />${product.name} has been reserved for delivery and a wallet ledger entry was recorded.`;
+              document.getElementById('successModal').classList.add('show');
+              showToast(`${product.name} purchased successfully.`);
+            }, 700);
+          }
+
+          const detailBtn = event.target.closest('[data-product-detail]');
+          if (detailBtn) {
+            const productName = detailBtn.dataset.productDetail;
+            const product = state.products.find(item => item.name === productName);
+            if (product) {
+              document.getElementById('successContent').innerHTML = `<strong>${product.name}</strong><br />Category: ${product.category}<br />Price: ৳${product.price}<br />Description: ${product.desc}`;
+              document.getElementById('successModal').classList.add('show');
+            }
+          }
+
+          const communityJoin = event.target.closest('[data-url]');
+          if (communityJoin) {
+            const url = communityJoin.dataset.url;
+            window.open(url, '_blank', 'noopener');
+          }
+        });
+      }
+
+      function init() {
+        setActiveAuth('login');
+        showPage('mainPage');
+        renderFeaturedProducts();
+        renderProducts('Chicken');
+        renderDepositHistory();
+        renderWithdrawHistory();
+        renderRecentActivity();
+        renderNotifications();
+        bindActions();
+      }
+
+      init();
+    </script>
+  </body>
 </html>
